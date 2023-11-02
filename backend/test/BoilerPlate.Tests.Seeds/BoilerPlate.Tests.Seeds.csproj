@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Bogus" Version="34.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\BoilerPlate.Core\BoilerPlate.Core.csproj" />
+      <ProjectReference Include="..\..\src\BoilerPlate.Data.DAL\BoilerPlate.Data.DAL.csproj" />
+      <ProjectReference Include="..\..\src\BoilerPlate.Data.Domain\BoilerPlate.Data.Domain.csproj" />
+      <ProjectReference Include="..\..\src\BoilerPlate.Data.DTO\BoilerPlate.Data.DTO.csproj" />
+      <ProjectReference Include="..\..\src\BoilerPlate.Data.Seeds\BoilerPlate.Data.Seeds.csproj" />
+    </ItemGroup>
+
+</Project>

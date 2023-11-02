@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BoilerPlate.Core\BoilerPlate.Core.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.DAL\BoilerPlate.Data.DAL.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.Domain\BoilerPlate.Data.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,19 @@
+﻿{
+  "profiles": {
+    "Local": {
+      "commandName": "Project",
+      "applicationUrl": "https://localhost:13096;http://localhost:13095",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Local",
+        "Jwt__PrivateKey": ""
+      }
+    },
+    "Development": {
+      "commandName": "Project",
+      "applicationUrl": "https://localhost:13096;http://localhost:13095",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

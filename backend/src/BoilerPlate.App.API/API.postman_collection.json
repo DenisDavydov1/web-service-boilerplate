@@ -1,0 +1,535 @@
+{
+	"info": {
+		"_postman_id": "7e783c19-84e1-4953-a83e-fb71b44cae18",
+		"name": "API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18671375",
+		"_collection_link": "https://grey-desert-159584-1.postman.co/workspace/boiler-plate~bf0d3063-eaca-4e27-a848-fdab2a321671/collection/18671375-7e783c19-84e1-4953-a83e-fb71b44cae18?action=share&source=collection_link&creator=18671375"
+	},
+	"item": [
+		{
+			"name": "System",
+			"item": [
+				{
+					"name": "Authentication",
+					"item": [
+						{
+							"name": "Authenticate user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let response = pm.response.json();",
+											"pm.collectionVariables.set(\"access_token\", response[\"accessToken\"]);",
+											"pm.collectionVariables.set(\"refresh_token\", response[\"refreshToken\"]);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"login\": \"user\",\n  \"password\": \"User1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/auth",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"auth"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Authenticate admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let response = pm.response.json();",
+											"pm.collectionVariables.set(\"access_token\", response[\"accessToken\"]);",
+											"pm.collectionVariables.set(\"refresh_token\", response[\"refreshToken\"]);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"login\": \"admin\",\n  \"password\": \"Admin1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/auth",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"auth"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Refresh access token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let response = pm.response.json();",
+											"pm.collectionVariables.set(\"access_token\", response[\"accessToken\"]);",
+											"pm.collectionVariables.set(\"refresh_token\", response[\"refreshToken\"]);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/auth/refresh",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"auth",
+										"refresh"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Get by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/users/dc8261ed-b8e0-4582-8ff0-e8ee94ba8f50",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"dc8261ed-b8e0-4582-8ff0-e8ee94ba8f50"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get current",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/users/current",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"current"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/users",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"users"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "take",
+											"value": "1",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"login\": \"login8a\",\n  \"password\": \"Admin1\",\n  \"name\": \"first name\",\n  \"email\": \"e@mail.com\",\n  \"languageCode\": \"en\",\n  \"role\": \"viewer\",\n  \"securityQuestions\": {\n    \"What is your first pet name?\": \"Prince\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/users/register",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Log out",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/users/log-out",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"log-out"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change password",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"oldPassword\": \"User1dsf\",\n  \"newPassword\": \"Uff123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/users/password",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"password"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "File storage",
+					"item": [
+						{
+							"name": "Get all",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/file-storage",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"file-storage"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Download file",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/file-storage/58104115-02dd-417b-9729-4855e1ff5902",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"file-storage",
+										"58104115-02dd-417b-9729-4855e1ff5902"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload file",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/Users/k8sh8r/Pictures/Photos/SAM_0648.JPG"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{host}}/api/file-storage",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"file-storage"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update stored file",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"kek.jpg\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/file-storage/58104115-02dd-417b-9729-4855e1ff5902",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"file-storage",
+										"58104115-02dd-417b-9729-4855e1ff5902"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete file",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/file-storage/58104115-02dd-417b-9729-4855e1ff5902",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"file-storage",
+										"58104115-02dd-417b-9729-4855e1ff5902"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Tests",
+					"item": [
+						{
+							"name": "Enqueue job",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"jobName\": \"LogFireJob\",\n  \"payload\": {\n    \"message\": \"uwu\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/tests/enqueue-job",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"tests",
+										"enqueue-job"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Kafka produce message",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"topic\": \"boiler-plate.test\",\n  \"type\": \"System_Tests_WithPayload\",\n  \"payload\": {\n    \"property\": \"uwu\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/tests/kafka-produce",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"tests",
+										"kafka-produce"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "https://localhost:13096",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "refresh_token",
+			"value": ""
+		}
+	]
+}

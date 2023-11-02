@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="Shouldly" Version="4.2.1" />
+    <PackageReference Include="xunit" Version="2.5.1" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BoilerPlate.App.Application\BoilerPlate.App.Application.csproj" />
+    <ProjectReference Include="..\..\src\BoilerPlate.Core\BoilerPlate.Core.csproj" />
+    <ProjectReference Include="..\..\src\BoilerPlate.Data.Seeds\BoilerPlate.Data.Seeds.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Tests.Seeds\BoilerPlate.Tests.Seeds.csproj" />
+  </ItemGroup>
+
+</Project>

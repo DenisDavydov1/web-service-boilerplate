@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <UserSecretsId>bf008ce0-04bc-41d0-94c4-30aefdd2a84d</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11" />
+    <PackageReference Include="Serilog" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Update="appsettings.Local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Update="appsettings.Test.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Remove="Swagger/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BoilerPlate.App.Application\BoilerPlate.App.Application.csproj" />
+    <ProjectReference Include="..\BoilerPlate.App.Jobs\BoilerPlate.App.Jobs.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Core\BoilerPlate.Core.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Core.Exceptions\BoilerPlate.Core.Exceptions.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.DAL\BoilerPlate.Data.DAL.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.Seeds\BoilerPlate.Data.Seeds.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Services.System\BoilerPlate.Services.System.csproj" />
+  </ItemGroup>
+
+  <Target Name="GenerateTsClient" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <Exec Command="dotnet tool restore --no-cache" ContinueOnError="WarnAndContinue" />
+    <MakeDir Directories="Swagger" Condition="!Exists('Swagger')" />
+    <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Local;SWAGGER_GEN=true" Command="dotnet swagger tofile --output Swagger/swagger.json $(TargetPath) v1" ContinueOnError="WarnAndContinue" />
+    <MakeDir Directories="../../../frontend/src/api/contracts" Condition="!Exists('../../../frontend/src/api/contracts')" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet run --project ../BoilerPlate.Utils.TsClientGenerator/BoilerPlate.Utils.TsClientGenerator.csproj Swagger/swagger.json ../../../frontend/src/api/tsclient.ts" ContinueOnError="WarnAndContinue" />
+  </Target>
+
+</Project>

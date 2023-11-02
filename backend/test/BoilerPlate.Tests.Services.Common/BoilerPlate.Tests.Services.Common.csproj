@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BoilerPlate.Services.System\BoilerPlate.Services.System.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Tests.Base\BoilerPlate.Tests.Base.csproj" />
+    <ProjectReference Include="..\..\src\BoilerPlate.App.API\BoilerPlate.App.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+  </ItemGroup>
+
+</Project>
