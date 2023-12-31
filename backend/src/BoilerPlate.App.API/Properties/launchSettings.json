@@ -4,8 +4,7 @@
       "commandName": "Project",
       "applicationUrl": "https://localhost:13096;http://localhost:13095",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Local",
-        "Jwt__PrivateKey": ""
+        "ASPNETCORE_ENVIRONMENT": "Local"
       }
     },
     "Development": {

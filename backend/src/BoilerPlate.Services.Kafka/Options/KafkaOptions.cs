@@ -9,6 +9,8 @@ public class KafkaOptions
 {
     public const string SectionName = "Kafka";
 
+    public bool Enabled { get; set; }
+
     /// <summary> Connections to Kafka (usually with port 9092) </summary>
     public string Servers { get; set; } = null!;
 

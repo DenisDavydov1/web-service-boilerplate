@@ -1,14 +1,13 @@
-using Coravel.Invocable;
-using Coravel.Queuing.Interfaces;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using BoilerPlate.App.API.Attributes;
 using BoilerPlate.Core.Exceptions.Factory;
 using BoilerPlate.Core.Utils;
 using BoilerPlate.Data.Abstractions.Enums;
 using BoilerPlate.Data.DTO.Common.Responses;
 using BoilerPlate.Data.DTO.System.Tests.Requests;
-using BoilerPlate.Services.Kafka.Producer;
+using Coravel.Invocable;
+using Coravel.Queuing.Interfaces;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BoilerPlate.App.API.Controllers;
 

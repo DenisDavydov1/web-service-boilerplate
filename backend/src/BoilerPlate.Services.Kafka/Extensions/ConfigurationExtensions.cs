@@ -6,6 +6,9 @@ namespace BoilerPlate.Services.Kafka.Extensions;
 public static class ConfigurationExtensions
 {
     /// <summary> Run with kafka services </summary>
-    public static bool IsKafkaEnabled(this IConfiguration configuration) =>
-        configuration.GetSection(KafkaOptions.SectionName).Exists();
+    public static bool IsKafkaEnabled(this IConfiguration configuration)
+    {
+        var section = configuration.GetSection(KafkaOptions.SectionName);
+        return section.Exists() && section.Get<KafkaOptions>()?.Enabled == true;
+    }
 }

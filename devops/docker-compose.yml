@@ -19,8 +19,8 @@ services:
     volumes:
       - ./data/nginx/conf:/etc/nginx/conf.d:ro
       - ./data/nginx/app:/app:ro
-      - ./data/certbot/conf:/etc/letsencrypt:ro
-      - ./data/certbot/www:/var/www/certbot:ro
+      # - ./data/certbot/conf:/etc/letsencrypt:ro
+      # - ./data/certbot/www:/var/www/certbot:ro
     networks:
       - boiler-plate-network
 
@@ -53,11 +53,9 @@ services:
         ../backend
     container_name: backend
     restart: always
-    # ports:
-    #   - 13095:80
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      Jwt__PrivateKey: ${BOILER_PLATE_JWT_PRIVATE_KEY}
+      # Jwt__PrivateKey: ${BOILER_PLATE_JWT_PRIVATE_KEY}
     volumes:
       - ./file-storage-root:/app/file-storage-root:rw
     depends_on:
