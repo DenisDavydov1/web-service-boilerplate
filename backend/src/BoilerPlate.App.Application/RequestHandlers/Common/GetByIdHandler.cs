@@ -11,8 +11,8 @@ using BoilerPlate.Data.DTO.Common.Requests;
 namespace BoilerPlate.App.Application.RequestHandlers.Common;
 
 public class GetByIdHandler<TEntity, TDto> : IRequestHandler<GetByIdRequest<TEntity, TDto>, TDto>
-    where TEntity : BaseIdEntity
-    where TDto : BaseIdDto
+    where TEntity : BaseEntity
+    where TDto : BaseEntityDto
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IExceptionFactory _exceptionFactory;
@@ -27,7 +27,7 @@ public class GetByIdHandler<TEntity, TDto> : IRequestHandler<GetByIdRequest<TEnt
 
     public async Task<TDto> Handle(GetByIdRequest<TEntity, TDto> request, CancellationToken ct)
     {
-        var entity = await _unitOfWork.IdRepository<TEntity>().GetByIdAsync(request.Id, ct);
+        var entity = await _unitOfWork.Repository<TEntity>().GetByIdAsync(request.Id, ct);
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             entity == null,
             ExceptionCode.Common_GetById_EntityNotFound,

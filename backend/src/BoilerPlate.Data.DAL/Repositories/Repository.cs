@@ -29,6 +29,9 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     public async Task<T?> GetAsync(Expression<Func<T, bool>> expression, CancellationToken ct = default)
         => await DbSet.FirstOrDefaultAsync(expression, ct);
 
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        => await DbSet.FindAsync([id], cancellationToken: ct);
+
     public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> expression, CancellationToken ct = default)
         => await DbSet.Where(expression).ToListAsync(ct);
 

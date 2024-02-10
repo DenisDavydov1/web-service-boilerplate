@@ -1,9 +1,11 @@
+using BoilerPlate.Data.DTO.Base;
+
 namespace BoilerPlate.Data.DTO.System.Authentication.Responses;
 
 /// <summary>
 /// User authentication result
 /// </summary>
-public class JwtTokensDto
+public class JwtTokensDto : BaseDto
 {
     /// <summary> Access token </summary>
     public required string AccessToken { get; init; } = null!;

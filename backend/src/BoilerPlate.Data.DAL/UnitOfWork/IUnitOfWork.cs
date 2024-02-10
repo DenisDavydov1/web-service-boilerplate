@@ -6,7 +6,6 @@ namespace BoilerPlate.Data.DAL.UnitOfWork;
 public interface IUnitOfWork : IDisposable
 {
     IRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity;
-    IIdRepository<TIdEntity> IdRepository<TIdEntity>() where TIdEntity : BaseIdEntity;
     Task BeginTransactionAsync(CancellationToken ct = default);
     Task CommitAsync(CancellationToken ct = default);
     Task RollbackAsync(CancellationToken ct = default);

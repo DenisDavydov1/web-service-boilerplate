@@ -17,4 +17,6 @@ public static class SerializationSettings
             new StringEnumConverter()
         }
     };
+
+    public static JsonSerializer Serializer => JsonSerializer.Create(Default);
 }

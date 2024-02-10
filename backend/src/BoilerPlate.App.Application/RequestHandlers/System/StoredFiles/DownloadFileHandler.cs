@@ -29,7 +29,7 @@ public class DownloadFileHandler : IRequestHandler<DownloadFileRequest, Download
 
     public async Task<DownloadFileResponse> Handle(DownloadFileRequest request, CancellationToken ct)
     {
-        var storedFile = await _unitOfWork.IdRepository<StoredFile>().GetByIdAsync(request.Id, ct);
+        var storedFile = await _unitOfWork.Repository<StoredFile>().GetByIdAsync(request.Id, ct);
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             storedFile == null,
             ExceptionCode.System_StoredFiles_DownloadFile_StoredFileNotFound,

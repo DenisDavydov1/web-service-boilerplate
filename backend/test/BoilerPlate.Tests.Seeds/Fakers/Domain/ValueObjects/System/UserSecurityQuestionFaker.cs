@@ -20,7 +20,7 @@ public class UserSecurityQuestionFaker : BaseFaker<UserSecurityQuestion>
         var valueObject = new UserSecurityQuestion
         {
             Question = Question,
-            AnswerHash = HashingUtils.Hash(Answer)
+            AnswerHash = HashingUtils.HashBCrypt(Answer)
         };
 
         return valueObject;

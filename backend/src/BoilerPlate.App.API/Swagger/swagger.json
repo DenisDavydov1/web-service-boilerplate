@@ -250,7 +250,7 @@
         "summary": "Get all stored files info",
         "parameters": [
           {
-            "name": "skip",
+            "name": "page",
             "in": "query",
             "style": "form",
             "schema": {
@@ -259,7 +259,7 @@
             }
           },
           {
-            "name": "take",
+            "name": "pageSize",
             "in": "query",
             "style": "form",
             "schema": {
@@ -274,26 +274,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StoredFileDto"
-                  }
+                  "$ref": "#/components/schemas/StoredFileDtoGetAllDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StoredFileDto"
-                  }
+                  "$ref": "#/components/schemas/StoredFileDtoGetAllDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StoredFileDto"
-                  }
+                  "$ref": "#/components/schemas/StoredFileDtoGetAllDto"
                 }
               }
             }
@@ -520,7 +511,7 @@
         "summary": "Get all users",
         "parameters": [
           {
-            "name": "skip",
+            "name": "page",
             "in": "query",
             "style": "form",
             "schema": {
@@ -529,7 +520,7 @@
             }
           },
           {
-            "name": "take",
+            "name": "pageSize",
             "in": "query",
             "style": "form",
             "schema": {
@@ -544,26 +535,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  }
+                  "$ref": "#/components/schemas/UserDtoGetAllDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  }
+                  "$ref": "#/components/schemas/UserDtoGetAllDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  }
+                  "$ref": "#/components/schemas/UserDtoGetAllDto"
                 }
               }
             }
@@ -887,6 +869,40 @@
         },
         "additionalProperties": false
       },
+      "StoredFileDtoGetAllDto": {
+        "required": [
+          "hasMore",
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StoredFileDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateStoredFileDto": {
         "required": [
           "name"
@@ -958,6 +974,40 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDtoGetAllDto": {
+        "required": [
+          "hasMore",
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasMore": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

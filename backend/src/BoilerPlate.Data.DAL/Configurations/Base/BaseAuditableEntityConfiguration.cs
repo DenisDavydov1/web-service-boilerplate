@@ -5,7 +5,7 @@ using BoilerPlate.Data.Domain.Entities.System;
 
 namespace BoilerPlate.Data.DAL.Configurations.Base;
 
-public abstract class BaseAuditableEntityConfiguration<TEntity> : BaseIdEntityConfiguration<TEntity>
+public abstract class BaseAuditableEntityConfiguration<TEntity> : BaseEntityConfiguration<TEntity>
     where TEntity : BaseAuditableEntity
 {
     protected override void ConfigureProperties(EntityTypeBuilder<TEntity> builder)

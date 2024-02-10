@@ -30,13 +30,13 @@ public class GetAccessTokenHandler : IRequestHandler<GetAccessTokenDto, JwtToken
 
     public async Task<JwtTokensDto> Handle(GetAccessTokenDto request, CancellationToken ct)
     {
-        var user = await _unitOfWork.IdRepository<User>().GetAsync(x => x.Login == request.Login, ct);
+        var user = await _unitOfWork.Repository<User>().GetAsync(x => x.Login == request.Login, ct);
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             user == null || user.IsDeleted,
             ExceptionCode.System_Authentication_GetAccessToken_UserNotFound,
             nameof(request.Login));
 
-        var isValidPassword = HashingUtils.Verify(request.Password, user!.PasswordHash);
+        var isValidPassword = HashingUtils.VerifyBCrypt(request.Password, user!.PasswordHash);
         _exceptionFactory.ThrowIf<BusinessException>(
             !isValidPassword,
             ExceptionCode.System_Authentication_GetAccessToken_PasswordInvalid,
@@ -52,7 +52,7 @@ public class GetAccessTokenHandler : IRequestHandler<GetAccessTokenDto, JwtToken
 
         await _unitOfWork.WithTransactionAsync(() =>
         {
-            _unitOfWork.IdRepository<User>().Update(user);
+            _unitOfWork.Repository<User>().Update(user);
         }, ct);
 
         return new JwtTokensDto

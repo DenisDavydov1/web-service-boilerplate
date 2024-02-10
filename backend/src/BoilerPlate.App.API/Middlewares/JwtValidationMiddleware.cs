@@ -32,7 +32,7 @@ public class JwtValidationMiddleware : IMiddleware
                 return;
             }
 
-            var user = await _unitOfWork.IdRepository<User>().GetByIdAsync(userId.Value);
+            var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId.Value);
             if (user == null || user.IsDeleted || user.AccessTokenId != jti || user.AccessTokenExpiresAt != exp)
             {
                 context.Response.StatusCode = 401;

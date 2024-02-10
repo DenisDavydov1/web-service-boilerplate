@@ -69,6 +69,14 @@ export interface IStoredFileDTO {
   id: string;
 }
 
+export interface IStoredFileDTOGetAllDTO {
+  items: IStoredFileDTO[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  hasMore: boolean;
+}
+
 export interface IUpdateStoredFileDTO {
   name: string;
 }
@@ -86,6 +94,14 @@ export interface IUserDTO {
   updatedBy?: string | null;
   updatedAt?: Date | null;
   id: string;
+}
+
+export interface IUserDTOGetAllDTO {
+  items: IUserDTO[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  hasMore: boolean;
 }
 
 export enum UserRole {

@@ -25,7 +25,7 @@ public class AuthenticationPostTests : BaseIntegrationTests
             Password = SeedConstants.AdminPassword
         };
 
-        var response = await PostAsync("auth", request);
+        var response = await PostAsync("api/auth", request);
         var tokensDto = await response.ToDtoAsync<JwtTokensDto>();
 
         tokensDto.AccessToken.ShouldNotBeNullOrEmpty();

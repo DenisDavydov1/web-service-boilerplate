@@ -5,7 +5,7 @@ namespace BoilerPlate.Data.Domain.Entities.Base;
 /// <summary>
 /// Entity with audit fields
 /// </summary>
-public abstract class BaseAuditableEntity : BaseIdEntity, IAuditable
+public abstract class BaseAuditableEntity : BaseEntity, IAuditable
 {
     /// <inheritdoc />
     public required Guid CreatedBy { get; set; }

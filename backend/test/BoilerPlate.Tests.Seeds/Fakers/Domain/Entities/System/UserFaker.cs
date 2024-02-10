@@ -47,7 +47,7 @@ public class UserFaker : BaseFaker<User>
         {
             Id = Id,
             Login = Login,
-            PasswordHash = HashingUtils.Hash(Password),
+            PasswordHash = HashingUtils.HashBCrypt(Password),
             Name = Name,
             Email = Email,
             LanguageCode = LanguageCode,

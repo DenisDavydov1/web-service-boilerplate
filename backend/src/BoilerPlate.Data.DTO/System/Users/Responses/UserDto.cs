@@ -7,7 +7,7 @@ namespace BoilerPlate.Data.DTO.System.Users.Responses;
 /// <summary>
 /// <inheritdoc cref="IUser"/> DTO
 /// </summary>
-public class UserDto : BaseSoftDeletableDto, IUser
+public sealed class UserDto : BaseSoftDeletableEntityDto, IUser
 {
     /// <inheritdoc />
     public required string Login { get; set; } = null!;

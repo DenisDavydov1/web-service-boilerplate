@@ -1,3 +1,4 @@
+using BoilerPlate.Data.DTO.Base;
 using MediatR;
 using BoilerPlate.Data.DTO.Common.Responses;
 
@@ -6,7 +7,7 @@ namespace BoilerPlate.Data.DTO.System.Users.Requests;
 /// <summary>
 /// Change password request DTO
 /// </summary>
-public class ChangeUserPasswordDto : IRequest<IdDto>
+public class ChangeUserPasswordDto : BaseDto, IRequest<IdDto>
 {
     /// <summary> Old user password </summary>
     public required string OldPassword { get; init; } = null!;

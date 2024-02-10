@@ -51,12 +51,13 @@ public class UsersController : BaseApiController
     /// <summary> Get all users </summary>
     [HttpGet]
     [MinimumRoleAuthorize(UserRole.Moderator)]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllAsync([FromQuery] int? skip, [FromQuery] int? take,
+    public async Task<ActionResult<GetAllDto<UserDto>>> GetAllAsync(
+        [FromQuery] int? page, [FromQuery] int? pageSize,
         CancellationToken ct)
     {
-        var request = new GetAllRequest<User, UserDto> { Skip = skip, Take = take };
+        var request = new GetAllRequest<User, UserDto> { Page = page, PageSize = pageSize };
         var response = await Mediator.Send(request, ct);
-        return response.ToArray();
+        return response;
     }
 
     #endregion

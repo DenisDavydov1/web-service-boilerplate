@@ -5,7 +5,7 @@ namespace BoilerPlate.Data.DTO.Base;
 /// <summary>
 /// DTO with audit fields
 /// </summary>
-public abstract class BaseAuditableDto : BaseIdDto, IAuditable
+public abstract class BaseAuditableEntityDto : BaseEntityDto, IAuditable
 {
     /// <inheritdoc />
     public required Guid CreatedBy { get; set; }

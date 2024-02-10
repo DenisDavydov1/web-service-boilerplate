@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{49A7CB
 		..\.gitignore = ..\.gitignore
 		nuget.config = nuget.config
 		Dockerfile = Dockerfile
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.Utils.TsClientGenerator", "src\BoilerPlate.Utils.TsClientGenerator\BoilerPlate.Utils.TsClientGenerator.csproj", "{E6EA31C5-F266-40F4-BA37-C7F07FBD8E58}"
@@ -61,6 +62,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.Tests.Services.Common", "test\BoilerPlate.Tests.Services.Common\BoilerPlate.Tests.Services.Common.csproj", "{5703CD9D-9634-49B7-B7CD-C98F4E8FFF85}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.Services.Kafka", "src\BoilerPlate.Services.Kafka\BoilerPlate.Services.Kafka.csproj", "{0169110A-3041-49F7-8E9E-765E310C10F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{60FCC6F2-0D28-48D0-AD47-0F68249E8380}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.Tests.Data.DAL", "test\BoilerPlate.Tests.Data.DAL\BoilerPlate.Tests.Data.DAL.csproj", "{2908074B-6B58-4010-AEA2-ACB17FF16E80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -140,6 +145,10 @@ Global
 		{0169110A-3041-49F7-8E9E-765E310C10F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0169110A-3041-49F7-8E9E-765E310C10F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0169110A-3041-49F7-8E9E-765E310C10F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2908074B-6B58-4010-AEA2-ACB17FF16E80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2908074B-6B58-4010-AEA2-ACB17FF16E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2908074B-6B58-4010-AEA2-ACB17FF16E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2908074B-6B58-4010-AEA2-ACB17FF16E80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7A743853-CBAE-4678-AF09-DE985A820C40} = {79BFC0EB-F987-42D1-A3AA-486522E2F4DC}
@@ -166,5 +175,7 @@ Global
 		{F1C60A33-0B4F-4B8A-AF7B-FF921FC7D518} = {EBDF250E-4C69-4B73-B2B1-DB7533B4AB42}
 		{5703CD9D-9634-49B7-B7CD-C98F4E8FFF85} = {F1C60A33-0B4F-4B8A-AF7B-FF921FC7D518}
 		{0169110A-3041-49F7-8E9E-765E310C10F6} = {75808891-2011-4419-8C80-3E138AF740B6}
+		{60FCC6F2-0D28-48D0-AD47-0F68249E8380} = {EBDF250E-4C69-4B73-B2B1-DB7533B4AB42}
+		{2908074B-6B58-4010-AEA2-ACB17FF16E80} = {60FCC6F2-0D28-48D0-AD47-0F68249E8380}
 	EndGlobalSection
 EndGlobal

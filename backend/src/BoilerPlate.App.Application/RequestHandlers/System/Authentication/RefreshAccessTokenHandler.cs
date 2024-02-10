@@ -42,7 +42,7 @@ public class RefreshAccessTokenHandler : IRequestHandler<RefreshAccessTokenDto, 
             ExceptionCode.System_Authentication_RefreshAccessToken_InvalidRefreshToken,
             nameof(request.RefreshToken));
 
-        var user = await _unitOfWork.IdRepository<User>().GetByIdAsync(userId!.Value, ct);
+        var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId!.Value, ct);
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             user == null || user.IsDeleted,
             ExceptionCode.System_Authentication_RefreshAccessToken_UserNotFound,
@@ -63,7 +63,7 @@ public class RefreshAccessTokenHandler : IRequestHandler<RefreshAccessTokenDto, 
 
         await _unitOfWork.WithTransactionAsync(() =>
         {
-            _unitOfWork.IdRepository<User>().Update(user);
+            _unitOfWork.Repository<User>().Update(user);
         }, ct);
 
         return new JwtTokensDto

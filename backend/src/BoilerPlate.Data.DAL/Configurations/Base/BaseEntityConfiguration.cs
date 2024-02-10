@@ -17,6 +17,9 @@ public abstract class BaseEntityConfiguration<TEntity> : IEntityTypeConfiguratio
         ConfigureRelations(builder);
     }
 
-    protected abstract void ConfigureProperties(EntityTypeBuilder<TEntity> builder);
-    protected abstract void ConfigureRelations(EntityTypeBuilder<TEntity> builder);
+    protected virtual void ConfigureProperties(EntityTypeBuilder<TEntity> builder) =>
+        builder.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd().IsRequired();
+
+    protected virtual void ConfigureRelations(EntityTypeBuilder<TEntity> builder) =>
+        builder.HasKey(x => x.Id);
 }

@@ -7,7 +7,7 @@ namespace BoilerPlate.Tests.Seeds.SeedFactories.System.Users;
 
 public static class UserSeedFactory
 {
-    public static async Task<User> SeedAsync(IUnitOfWork unitOfWork, Action<UserSeedOptions>? configure = default)
+    public static async Task<(User User, string Password)> SeedAsync(IUnitOfWork unitOfWork, Action<UserSeedOptions>? configure = default)
     {
         var options = new UserSeedOptions();
         configure?.Invoke(options);
@@ -23,6 +23,6 @@ public static class UserSeedFactory
         await unitOfWork.Repository<User>().AddAsync(user);
         await unitOfWork.SaveAsync();
 
-        return user;
+        return (user, userFaker.Password);
     }
 }

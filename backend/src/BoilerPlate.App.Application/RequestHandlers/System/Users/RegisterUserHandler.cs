@@ -33,7 +33,7 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserDto, IdDto>
 
     public async Task<IdDto> Handle(RegisterUserDto request, CancellationToken ct)
     {
-        var isUserExist = await _unitOfWork.IdRepository<User>().ExistsAsync(x => x.Login == request.Login, ct);
+        var isUserExist = await _unitOfWork.Repository<User>().ExistsAsync(x => x.Login == request.Login, ct);
         _exceptionFactory.ThrowIf<BusinessException>(
             isUserExist,
             ExceptionCode.System_Users_RegisterUser_LoginTaken,
@@ -41,19 +41,19 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserDto, IdDto>
 
         var user = _mapper.Map<User>(request);
         user.Role = UserRole.User;
-        user.PasswordHash = HashingUtils.Hash(request.Password);
+        user.PasswordHash = HashingUtils.HashBCrypt(request.Password);
         user.SecurityQuestions = request.SecurityQuestions
             .Select(x => new UserSecurityQuestion
             {
                 Question = x.Key,
-                AnswerHash = HashingUtils.Hash(x.Value)
+                AnswerHash = HashingUtils.HashBCrypt(x.Value)
             })
             .ToArray();
         user.CreatedBy = SeedConstants.RootUserId;
 
         await _unitOfWork.WithTransactionAsync(async () =>
         {
-            await _unitOfWork.IdRepository<User>().AddAsync(user, ct);
+            await _unitOfWork.Repository<User>().AddAsync(user, ct);
         }, ct);
 
         var notification = new UserCreatedNotification { User = user };

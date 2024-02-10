@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Migrations;
 using BoilerPlate.Data.Domain.ValueObjects.System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 

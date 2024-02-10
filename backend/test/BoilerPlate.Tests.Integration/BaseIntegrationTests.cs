@@ -27,16 +27,10 @@ public abstract class BaseIntegrationTests : BaseDbTests, IClassFixture<TestWebA
         _client = _factory.CreateClient();
     }
 
-    protected async Task AuthorizeAsync(UserRole role)
+    protected async Task AuthorizeAsync(string login, string password)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, "auth");
-
-        var requestBody = role switch
-        {
-            UserRole.User => new GetAccessTokenDto {Login = SeedConstants.UserLogin, Password = SeedConstants.UserPassword },
-            UserRole.Admin => new GetAccessTokenDto { Login = SeedConstants.AdminLogin, Password = SeedConstants.AdminPassword },
-            _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
-        };
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/auth");
+        var requestBody = new GetAccessTokenDto { Login = login, Password = password };
         request.Content = Serialize(requestBody);
 
         using var response = await _client.SendAsync(request);
@@ -53,6 +47,9 @@ public abstract class BaseIntegrationTests : BaseDbTests, IClassFixture<TestWebA
 
     protected async Task<HttpResponseMessage> DeleteAsync(string uri) =>
         await _client.DeleteAsync(uri);
+
+    protected async Task<HttpResponseMessage> PostAsync(string uri) =>
+        await _client.PostAsync(uri, null);
 
     protected async Task<HttpResponseMessage> PostAsync<TCommand>(string uri, TCommand command)
         where TCommand : class =>

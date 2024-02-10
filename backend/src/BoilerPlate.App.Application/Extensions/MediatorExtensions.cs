@@ -4,6 +4,7 @@ using BoilerPlate.App.Application.RequestHandlers.Common;
 using BoilerPlate.Core.Utils;
 using BoilerPlate.Data.Domain.Entities.System;
 using BoilerPlate.Data.DTO.Common.Requests;
+using BoilerPlate.Data.DTO.Common.Responses;
 using BoilerPlate.Data.DTO.System.StoredFiles.Responses;
 using BoilerPlate.Data.DTO.System.Users.Responses;
 
@@ -16,14 +17,16 @@ public static class MediatorExtensions
         services.AddMediatR(_ => _.RegisterServicesFromAssemblies(AssemblyUtils.BoilerPlateAssemblies));
 
         // Get by ID
-        services.AddTransient<IRequestHandler<GetByIdRequest<User, UserDto>, UserDto>, GetByIdHandler<User, UserDto>>();
+        services.AddTransient<
+            IRequestHandler<GetByIdRequest<User, UserDto>, UserDto>,
+            GetByIdHandler<User, UserDto>>();
 
         // Get all
         services.AddTransient<
-            IRequestHandler<GetAllRequest<User, UserDto>, IEnumerable<UserDto>>,
+            IRequestHandler<GetAllRequest<User, UserDto>, GetAllDto<UserDto>>,
             GetAllHandler<User, UserDto>>();
         services.AddTransient<
-            IRequestHandler<GetAllRequest<StoredFile, StoredFileDto>, IEnumerable<StoredFileDto>>,
+            IRequestHandler<GetAllRequest<StoredFile, StoredFileDto>, GetAllDto<StoredFileDto>>,
             GetAllHandler<StoredFile, StoredFileDto>>();
     }
 }

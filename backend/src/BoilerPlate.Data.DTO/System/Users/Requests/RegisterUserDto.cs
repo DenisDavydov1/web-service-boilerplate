@@ -2,6 +2,7 @@ using MediatR;
 using Newtonsoft.Json;
 using BoilerPlate.Data.Abstractions.Enums;
 using BoilerPlate.Data.Abstractions.System;
+using BoilerPlate.Data.DTO.Base;
 using BoilerPlate.Data.DTO.Common.Responses;
 
 namespace BoilerPlate.Data.DTO.System.Users.Requests;
@@ -9,7 +10,7 @@ namespace BoilerPlate.Data.DTO.System.Users.Requests;
 /// <summary>
 /// User registration DTO
 /// </summary>
-public class RegisterUserDto : IUser, IRequest<IdDto>
+public class RegisterUserDto : BaseDto, IUser, IRequest<IdDto>
 {
     /// <inheritdoc />
     public required string Login { get; init; } = null!;

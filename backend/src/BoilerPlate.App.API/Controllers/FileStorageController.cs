@@ -38,12 +38,12 @@ public class FileStorageController : BaseApiController
     /// <summary> Get all stored files info </summary>
     [HttpGet]
     [MinimumRoleAuthorize(UserRole.Viewer)]
-    public async Task<ActionResult<IEnumerable<StoredFileDto>>> GetAllFilesInfoAsync(
-        [FromQuery] int? skip, [FromQuery] int? take, CancellationToken ct)
+    public async Task<ActionResult<GetAllDto<StoredFileDto>>> GetAllFilesInfoAsync(
+        [FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken ct)
     {
-        var request = new GetAllRequest<StoredFile, StoredFileDto> { Skip = skip, Take = take };
+        var request = new GetAllRequest<StoredFile, StoredFileDto> { Page = page, PageSize = pageSize };
         var response = await Mediator.Send(request, ct);
-        return response.ToArray();
+        return response;
     }
 
     #endregion

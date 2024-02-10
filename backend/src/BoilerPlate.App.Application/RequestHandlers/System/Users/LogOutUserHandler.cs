@@ -26,6 +26,6 @@ public class LogOutUserHandler : IRequestHandler<LogOutUserRequest>
         user.RefreshTokenId = null;
         user.RefreshTokenExpiresAt = null;
 
-        await _unitOfWork.WithTransactionAsync(() => _unitOfWork.IdRepository<User>().Update(user), ct);
+        await _unitOfWork.WithTransactionAsync(() => _unitOfWork.Repository<User>().Update(user), ct);
     }
 }

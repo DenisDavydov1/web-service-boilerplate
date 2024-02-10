@@ -27,7 +27,7 @@ internal class UsersSeeds : BaseSoftDeletableSeeds<User>
         {
             Id = Guid.Parse("ffbd7478-11b6-45d4-8a5f-cc6ca66448fc"),
             Login = SeedConstants.AdminLogin,
-            PasswordHash = HashingUtils.Hash(SeedConstants.AdminPassword),
+            PasswordHash = HashingUtils.HashBCrypt(SeedConstants.AdminPassword),
             Name = "Admin",
             Email = "admin@boilerPlate.com",
             LanguageCode = LanguageCodes.English,
@@ -39,7 +39,7 @@ internal class UsersSeeds : BaseSoftDeletableSeeds<User>
         {
             Id = Guid.Parse("fded35a5-f10b-4e4b-aaf5-00eacbe939ad"),
             Login = SeedConstants.UserLogin,
-            PasswordHash = HashingUtils.Hash(SeedConstants.UserPassword),
+            PasswordHash = HashingUtils.HashBCrypt(SeedConstants.UserPassword),
             Name = "User",
             Email = "user@boilerPlate.com",
             LanguageCode = LanguageCodes.Russian,

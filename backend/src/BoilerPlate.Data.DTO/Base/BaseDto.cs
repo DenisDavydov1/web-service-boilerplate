@@ -3,6 +3,4 @@ namespace BoilerPlate.Data.DTO.Base;
 /// <summary>
 /// DTO base
 /// </summary>
-public abstract class BaseDto
-{
-}
+public abstract class BaseDto;

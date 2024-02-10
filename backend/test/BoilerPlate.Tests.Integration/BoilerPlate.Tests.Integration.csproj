@@ -9,13 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BoilerPlate.App.API\BoilerPlate.App.API.csproj" />
     <ProjectReference Include="..\BoilerPlate.Tests.Base\BoilerPlate.Tests.Base.csproj" />
     <ProjectReference Include="..\BoilerPlate.Tests.Seeds\BoilerPlate.Tests.Seeds.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.12" />
   </ItemGroup>
 

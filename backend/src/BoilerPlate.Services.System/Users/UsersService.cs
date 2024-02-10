@@ -29,7 +29,7 @@ internal class UsersService : IUsersService
     public async Task<User> GetCurrentUser(CancellationToken ct = default)
     {
         var id = GetCurrentUserId();
-        var user = await _unitOfWork.IdRepository<User>().GetByIdAsync(id, ct);
+        var user = await _unitOfWork.Repository<User>().GetByIdAsync(id, ct);
         return user ?? throw new AuthenticationException();
     }
 }

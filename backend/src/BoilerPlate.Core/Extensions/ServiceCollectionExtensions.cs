@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -28,4 +29,7 @@ public static class ServiceCollectionExtensions
         culture.DateTimeFormat.LongTimePattern = "";
         Thread.CurrentThread.CurrentCulture = culture;
     }
+
+    public static IConfiguration GetConfiguration(this IServiceCollection services) =>
+        (IConfiguration) services.Single(x => x.ServiceType == typeof(IConfiguration)).ImplementationInstance!;
 }

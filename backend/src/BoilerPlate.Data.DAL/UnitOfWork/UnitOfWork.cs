@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore.Storage;
 using BoilerPlate.Data.DAL.Repositories;
 using BoilerPlate.Data.Domain.Entities.Base;
@@ -6,6 +7,8 @@ namespace BoilerPlate.Data.DAL.UnitOfWork;
 
 internal class UnitOfWork : IUnitOfWork
 {
+    private readonly ConcurrentDictionary<Type, object> _repositoriesCache = new();
+
     private readonly BoilerPlateDbContext _dbContext;
     private IDbContextTransaction? _transaction;
 
@@ -15,16 +18,25 @@ internal class UnitOfWork : IUnitOfWork
     public void Dispose() => _dbContext.Dispose();
 
     public IRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity
-        => new Repository<TEntity>(_dbContext);
+    {
+        var isInCache = _repositoriesCache.TryGetValue(typeof(TEntity), out var repositoryObject);
+        if (isInCache) return (IRepository<TEntity>) repositoryObject!;
 
-    public IIdRepository<TIdEntity> IdRepository<TIdEntity>() where TIdEntity : BaseIdEntity
-        => new IdRepository<TIdEntity>(_dbContext);
+        var repository = new Repository<TEntity>(_dbContext);
+        var isAdded = _repositoriesCache.TryAdd(typeof(TEntity), repository);
+        if (!isAdded)
+        {
+            throw new Exception("Repository add error");
+        }
+
+        return repository;
+    }
 
     public async Task BeginTransactionAsync(CancellationToken ct = default)
     {
         if (_transaction != null)
         {
-            throw new Exception("Transaction has already begun");
+            throw new Exception("Transaction has already started");
         }
 
         _transaction = await _dbContext.Database.BeginTransactionAsync(ct);
@@ -34,7 +46,7 @@ internal class UnitOfWork : IUnitOfWork
     {
         if (_transaction == null)
         {
-            throw new Exception("Transaction has not began");
+            throw new Exception("Transaction has not started");
         }
 
         await _transaction.CommitAsync(ct);
@@ -46,7 +58,7 @@ internal class UnitOfWork : IUnitOfWork
     {
         if (_transaction == null)
         {
-            throw new Exception("Transaction has not began");
+            throw new Exception("Transaction has not started");
         }
 
         await _transaction.RollbackAsync(ct);

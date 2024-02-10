@@ -26,12 +26,12 @@ public class UsersPostTests : BaseIntegrationTests
 
         var response = await PostAsync("api/users/register", request);
         var createdDto = await response.ToDtoAsync<IdDto>();
-        var user = await UnitOfWork.IdRepository<User>().GetByIdAsync(createdDto.Id);
+        var user = await UnitOfWork.Repository<User>().GetByIdAsync(createdDto.Id);
 
         response.EnsureSuccessStatusCode();
         user.ShouldNotBeNull();
         user.Login.ShouldBe(request.Login);
-        HashingUtils.Verify(request.Password, user.PasswordHash).ShouldBeTrue();
+        HashingUtils.VerifyBCrypt(request.Password, user.PasswordHash).ShouldBeTrue();
         user.Name.ShouldBe(request.Name);
         user.Email.ShouldBe(request.Email);
         user.LanguageCode.ShouldBe(request.LanguageCode);

@@ -32,15 +32,15 @@ public class ChangeUserPasswordHandler : IRequestHandler<ChangeUserPasswordDto, 
     {
         var user = await _usersService.GetCurrentUser(ct);
 
-        var isOldPasswordValid = HashingUtils.Verify(request.OldPassword, user!.PasswordHash);
+        var isOldPasswordValid = HashingUtils.VerifyBCrypt(request.OldPassword, user!.PasswordHash);
         _exceptionFactory.ThrowIf<BusinessException>(
             isOldPasswordValid == false,
             ExceptionCode.System_Users_ChangeUserPassword_OldPasswordInvalid,
             nameof(request.OldPassword));
 
-        user.PasswordHash = HashingUtils.Hash(request.NewPassword);
+        user.PasswordHash = HashingUtils.HashBCrypt(request.NewPassword);
 
-        await _unitOfWork.WithTransactionAsync(() => _unitOfWork.IdRepository<User>().Update(user), ct);
+        await _unitOfWork.WithTransactionAsync(() => _unitOfWork.Repository<User>().Update(user), ct);
 
         return _mapper.Map<IdDto>(user);
     }

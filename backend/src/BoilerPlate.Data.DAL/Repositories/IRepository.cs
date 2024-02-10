@@ -14,6 +14,7 @@ public interface IRepository<T> where T : BaseEntity
     void RemoveRange(IEnumerable<T> entities);
 
     Task<T?> GetAsync(Expression<Func<T, bool>> expression, CancellationToken ct = default);
+    Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> expression, CancellationToken ct = default);
     IQueryable<T> GetAllAsQueryable();
 

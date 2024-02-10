@@ -1,12 +1,8 @@
-using BoilerPlate.Data.Abstractions.Base;
+using BoilerPlate.Data.DTO.Base;
 
 namespace BoilerPlate.Data.DTO.Common.Responses;
 
 /// <summary>
 /// Object with ID DTO
 /// </summary>
-public class IdDto : IIdentifiable
-{
-    /// <inheritdoc />
-    public required Guid Id { get; set; }
-}
+public sealed class IdDto : BaseEntityDto;

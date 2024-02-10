@@ -3,13 +3,13 @@ using BoilerPlate.Data.Domain.Entities.Base;
 
 namespace BoilerPlate.Data.Seeds.Common;
 
-internal abstract class BaseIdSeeds<TIdEntity> : BaseSeeds where TIdEntity : BaseIdEntity
+internal abstract class BaseIdSeeds<TEntity> : BaseSeeds where TEntity : BaseEntity
 {
-    protected abstract IEnumerable<TIdEntity> Seeds { get; }
+    protected abstract IEnumerable<TEntity> Seeds { get; }
 
     public override async Task SeedAsync(IUnitOfWork unitOfWork, CancellationToken ct = default)
     {
-        var repository = unitOfWork.IdRepository<TIdEntity>();
+        var repository = unitOfWork.Repository<TEntity>();
 
         await unitOfWork.WithTransactionAsync(async () =>
         {
@@ -30,5 +30,5 @@ internal abstract class BaseIdSeeds<TIdEntity> : BaseSeeds where TIdEntity : Bas
         }, ct);
     }
 
-    protected abstract void UpdateEntity(TIdEntity entity, TIdEntity existingEntity);
+    protected abstract void UpdateEntity(TEntity entity, TEntity existingEntity);
 }

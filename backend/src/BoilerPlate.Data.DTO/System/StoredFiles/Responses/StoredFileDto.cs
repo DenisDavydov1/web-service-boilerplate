@@ -6,7 +6,7 @@ namespace BoilerPlate.Data.DTO.System.StoredFiles.Responses;
 /// <summary>
 /// Stored file DTO
 /// </summary>
-public class StoredFileDto : BaseAuditableDto, IStoredFile
+public sealed class StoredFileDto : BaseAuditableEntityDto, IStoredFile
 {
     /// <inheritdoc />
     public required string Name { get; set; }
