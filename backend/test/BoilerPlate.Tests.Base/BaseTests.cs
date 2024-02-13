@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using BoilerPlate.App.Application.Extensions;
+using BoilerPlate.App.Handlers.Extensions;
 using BoilerPlate.Tests.Base.Logging;
 using Xunit.Abstractions;
 

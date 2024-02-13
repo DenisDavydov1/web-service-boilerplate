@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BoilerPlate.Core\BoilerPlate.Core.csproj" />
+      <ProjectReference Include="..\BoilerPlate.Data.Domain\BoilerPlate.Data.Domain.csproj" />
+      <ProjectReference Include="..\BoilerPlate.Data.DTO\BoilerPlate.Data.DTO.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="13.0.1" />
+    </ItemGroup>
+
+</Project>

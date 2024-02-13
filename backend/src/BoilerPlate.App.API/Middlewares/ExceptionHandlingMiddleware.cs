@@ -155,6 +155,12 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
             #region 500_InternalServerError
 
+            case IntegrationException ex:
+                details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1";
+                details.Title = "Internal Server Error";
+                details.Status = (int)HttpStatusCode.InternalServerError;
+                details.Errors.Add("Internal Server Error", [ex.Message]);
+                break;
             default:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1";
                 details.Title = "Internal Server Error";

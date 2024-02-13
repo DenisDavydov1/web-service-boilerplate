@@ -1,8 +1,10 @@
 using System.Reflection;
 using BoilerPlate.App.API.Extensions;
 using BoilerPlate.App.API.Middlewares;
-using BoilerPlate.App.Application.Extensions;
+using BoilerPlate.App.Handlers.Extensions;
 using BoilerPlate.App.Jobs.Extensions;
+using BoilerPlate.App.Mappers.Extensions;
+using BoilerPlate.App.Validators.Extensions;
 using BoilerPlate.Core.Exceptions.Extensions;
 using BoilerPlate.Core.Extensions;
 using BoilerPlate.Core.Utils;
@@ -20,7 +22,7 @@ if (builder.Environment.IsLocal() || builder.Environment.IsTest())
 builder.Services.AddDatabase(configuration);
 builder.Services.AddUnitOfWork();
 builder.Services.AddMediator();
-builder.Services.AddMapper();
+builder.Services.AddMappers();
 builder.Services.AddValidators();
 builder.Services.AddAuthentication(configuration);
 builder.Services.AddUserRoleAuthorization();

@@ -2,8 +2,8 @@ using System.Security.Claims;
 using CaseExtensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BoilerPlate.App.API.Constants;
-using BoilerPlate.App.Application.Options;
-using BoilerPlate.App.Application.Utils;
+using BoilerPlate.App.Handlers.Options;
+using BoilerPlate.App.Handlers.Utils;
 using BoilerPlate.Data.Abstractions.Enums;
 
 namespace BoilerPlate.App.API.Extensions;

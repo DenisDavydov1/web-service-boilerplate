@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BoilerPlate.App.Mappers\BoilerPlate.App.Mappers.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Core.Exceptions\BoilerPlate.Core.Exceptions.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Core\BoilerPlate.Core.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.DAL\BoilerPlate.Data.DAL.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.Domain\BoilerPlate.Data.Domain.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.DTO\BoilerPlate.Data.DTO.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.Notifications\BoilerPlate.Data.Notifications.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Data.Seeds\BoilerPlate.Data.Seeds.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Services.Kafka\BoilerPlate.Services.Kafka.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Services.System\BoilerPlate.Services.System.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>

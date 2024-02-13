@@ -33,8 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BoilerPlate.App.Application\BoilerPlate.App.Application.csproj" />
+    <ProjectReference Include="..\BoilerPlate.App.Handlers\BoilerPlate.App.Handlers.csproj" />
     <ProjectReference Include="..\BoilerPlate.App.Jobs\BoilerPlate.App.Jobs.csproj" />
+    <ProjectReference Include="..\BoilerPlate.App.Mappers\BoilerPlate.App.Mappers.csproj" />
+    <ProjectReference Include="..\BoilerPlate.App.Validators\BoilerPlate.App.Validators.csproj" />
     <ProjectReference Include="..\BoilerPlate.Core\BoilerPlate.Core.csproj" />
     <ProjectReference Include="..\BoilerPlate.Core.Exceptions\BoilerPlate.Core.Exceptions.csproj" />
     <ProjectReference Include="..\BoilerPlate.Data.DAL\BoilerPlate.Data.DAL.csproj" />

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using BoilerPlate.App.Application.Options;
+using BoilerPlate.App.Handlers.Options;
 using BoilerPlate.Core.Utils;
 
 namespace BoilerPlate.App.API.Extensions;

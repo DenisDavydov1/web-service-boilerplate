@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BoilerPlate.App.Application\BoilerPlate.App.Application.csproj" />
+    <ProjectReference Include="..\..\src\BoilerPlate.App.Handlers\BoilerPlate.App.Handlers.csproj" />
     <ProjectReference Include="..\..\src\BoilerPlate.Core\BoilerPlate.Core.csproj" />
     <ProjectReference Include="..\..\src\BoilerPlate.Data.Seeds\BoilerPlate.Data.Seeds.csproj" />
     <ProjectReference Include="..\BoilerPlate.Tests.Seeds\BoilerPlate.Tests.Seeds.csproj" />
