@@ -1,50 +1,23 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BoilerPlate.Tests.Integration;
 
 public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
+    public Action<IServiceCollection> AddServices { get; set; } = _ => { };
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Test");
 
-        builder.ConfigureAppConfiguration((hostingContext, config) =>
+        builder.ConfigureAppConfiguration((_, config) =>
         {
             config.AddJsonFile("appsettings.Test.json", optional: false);
         });
 
-        // builder.ConfigureServices(services =>
-        // {
-            // var dbContextDescriptor = services.SingleOrDefault(
-            //     d => d.ServiceType ==
-            //          typeof(DbContextOptions<GervigDbContext>));
-            //
-            // services.Remove(dbContextDescriptor);
-            //
-            // var dbConnectionDescriptor = services.SingleOrDefault(
-            //     d => d.ServiceType ==
-            //          typeof(DbConnection));
-            //
-            // services.Remove(dbConnectionDescriptor);
-
-            // services.AddDbContext<GervigDbContext>(options =>
-            // {
-            //     var configuration = new ConfigurationBuilder()
-            //         .AddJsonFile("appsettings.IntTests.json")
-            //         .Build();
-            //
-            //     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-            // });
-
-            // var serviceProvider = services.BuildServiceProvider();
-            //
-            // using var serviceScope = serviceProvider.CreateScope();
-            // var context = serviceScope.ServiceProvider.GetRequiredService<GervigDbContext>();
-            // context.Database.EnsureDeleted();
-            //
-            // IntegrationTestsDatabaseInitializer.InitializeGervigDbContext(context);
-        // });
+        builder.ConfigureServices(AddServices);
     }
 }

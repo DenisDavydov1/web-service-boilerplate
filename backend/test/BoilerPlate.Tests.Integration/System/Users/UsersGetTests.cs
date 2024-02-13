@@ -6,6 +6,7 @@ using BoilerPlate.Data.DTO.System.Users.Responses;
 using BoilerPlate.Data.Seeds.Constants;
 using BoilerPlate.Tests.Integration.Extensions;
 using BoilerPlate.Tests.Seeds.SeedFactories.System.Users;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
@@ -18,6 +19,9 @@ public class UsersGetTests : BaseIntegrationTests
         : base(factory, testOutputHelper)
     {
     }
+
+    protected override void AddServices(IServiceCollection services) => base.AddServices(services);
+    protected override void AddHostServices(IServiceCollection services) => base.AddHostServices(services);
 
     [Fact]
     public async Task GetByIdAsync_AdminRole_ShouldSuccess()

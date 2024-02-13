@@ -10,6 +10,7 @@ using BoilerPlate.Data.DTO.System.Authentication.Requests;
 using BoilerPlate.Data.DTO.System.Authentication.Responses;
 using BoilerPlate.Data.Seeds.Constants;
 using BoilerPlate.Tests.Base;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,14 +18,17 @@ namespace BoilerPlate.Tests.Integration;
 
 public abstract class BaseIntegrationTests : BaseDbTests, IClassFixture<TestWebApplicationFactory<Program>>
 {
-    private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
     protected BaseIntegrationTests(TestWebApplicationFactory<Program> factory, ITestOutputHelper testOutputHelper)
         : base(testOutputHelper)
     {
-        _factory = factory;
-        _client = _factory.CreateClient();
+        factory.AddServices = AddHostServices;
+        _client = factory.CreateClient();
+    }
+
+    protected virtual void AddHostServices(IServiceCollection services)
+    {
     }
 
     protected async Task AuthorizeAsync(string login, string password)
