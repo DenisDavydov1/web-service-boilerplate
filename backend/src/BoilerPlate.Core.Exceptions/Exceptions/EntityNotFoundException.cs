@@ -1,12 +1,9 @@
+using BoilerPlate.Core.Exceptions.Enums;
+
 namespace BoilerPlate.Core.Exceptions.Exceptions;
 
-public class EntityNotFoundException : Exception
+public class EntityNotFoundException(ExceptionCode code, string message, string? paramName)
+    : BaseExceptionWithCode(code, message)
 {
-    public string? ParamName { get; set; }
-
-    public EntityNotFoundException() { }
-
-    public EntityNotFoundException(string message) : base(message) { }
-
-    public EntityNotFoundException(string message, string? paramName) : base(message) => ParamName = paramName;
+    public string? ParamName { get; set; } = paramName;
 }

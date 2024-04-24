@@ -1,21 +1,13 @@
+using BoilerPlate.Core.Exceptions.Enums;
+
 namespace BoilerPlate.Core.Exceptions.Exceptions;
 
 /// <summary>
 /// Business logics error exception
 /// </summary>
 /// <errorCode> 400 </errorCode>
-public class BusinessException : Exception
+public class BusinessException(ExceptionCode code, string message, params string[]? parameterNames)
+    : BaseExceptionWithCode(code, message)
 {
-    public IEnumerable<string>? ParameterNames { get; }
-
-    public BusinessException()
-    {
-    }
-
-    public BusinessException(string message) : base(message)
-    {
-    }
-
-    public BusinessException(string message, params string[]? parameterNames) : base(message) =>
-        ParameterNames = parameterNames;
+    public IEnumerable<string>? ParameterNames { get; } = parameterNames;
 }

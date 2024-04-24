@@ -1,16 +1,13 @@
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
 using BoilerPlate.App.API;
 using BoilerPlate.Core.Serialization;
-using BoilerPlate.Data.Abstractions.Enums;
 using BoilerPlate.Data.DTO.System.Authentication.Requests;
 using BoilerPlate.Data.DTO.System.Authentication.Responses;
-using BoilerPlate.Data.Seeds.Constants;
 using BoilerPlate.Tests.Base;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -46,11 +43,21 @@ public abstract class BaseIntegrationTests : BaseDbTests, IClassFixture<TestWebA
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResponse?.AccessToken);
     }
 
+    #region GET
+
     protected async Task<HttpResponseMessage> GetAsync(string uri) =>
         await _client.GetAsync(uri);
 
+    #endregion
+
+    #region DELETE
+
     protected async Task<HttpResponseMessage> DeleteAsync(string uri) =>
         await _client.DeleteAsync(uri);
+
+    #endregion
+
+    #region POST
 
     protected async Task<HttpResponseMessage> PostAsync(string uri) =>
         await _client.PostAsync(uri, null);
@@ -59,13 +66,38 @@ public abstract class BaseIntegrationTests : BaseDbTests, IClassFixture<TestWebA
         where TCommand : class =>
         await _client.PostAsync(uri, Serialize(command));
 
+    protected async Task<HttpResponseMessage> PostAsync(string uri, HttpContent httpContent) =>
+        await _client.PostAsync(uri, httpContent);
+
+    #endregion
+
+    #region PUT
+
+    protected async Task<HttpResponseMessage> PutAsync(string uri) =>
+        await _client.PutAsync(uri, null);
+
     protected async Task<HttpResponseMessage> PutAsync<TCommand>(string uri, TCommand command)
         where TCommand : class =>
         await _client.PutAsync(uri, Serialize(command));
 
+    protected async Task<HttpResponseMessage> PutAsync(string uri, HttpContent httpContent) =>
+        await _client.PutAsync(uri, httpContent);
+
+    #endregion
+
+    #region PATCH
+
+    protected async Task<HttpResponseMessage> PatchAsync(string uri) =>
+        await _client.PatchAsync(uri, null);
+
     protected async Task<HttpResponseMessage> PatchAsync<TCommand>(string uri, TCommand command)
         where TCommand : class =>
         await _client.PatchAsync(uri, Serialize(command));
+
+    protected async Task<HttpResponseMessage> PatchAsync(string uri, HttpContent httpContent) =>
+        await _client.PatchAsync(uri, httpContent);
+
+    #endregion
 
     private static StringContent Serialize<TCommand>(TCommand command) where TCommand : class =>
         new (JsonConvert.SerializeObject(command, SerializationSettings.Default), Encoding.UTF8, MediaTypeNames.Application.Json);

@@ -49,7 +49,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case ValidationException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
                 details.Title = "One or more validation errors occurred.";
-                details.Status = (int)HttpStatusCode.BadRequest;
+                details.Status = (int) HttpStatusCode.BadRequest;
                 ex.Errors
                     .GroupBy(x => x.PropertyName)
                     .ToDictionary(
@@ -61,13 +61,13 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case ArgumentException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
                 details.Title = "One or more validation errors occurred.";
-                details.Status = (int)HttpStatusCode.BadRequest;
+                details.Status = (int) HttpStatusCode.BadRequest;
                 details.Errors.Add(ex.ParamName.ToCamelCase() ?? "Validation Error", [ex.Message]);
                 break;
             case BusinessException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
                 details.Title = "One or more validation errors occurred.";
-                details.Status = (int)HttpStatusCode.BadRequest;
+                details.Status = (int) HttpStatusCode.BadRequest;
                 if (ex.ParameterNames?.Any() == true)
                 {
                     ex.ParameterNames.ToList().ForEach(p => details.Errors.Add(p.ToCamelCase(), [ex.Message]));
@@ -80,7 +80,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case EntityNotFoundException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4";
                 details.Title = "Entity Not Found Error";
-                details.Status = (int)HttpStatusCode.BadRequest;
+                details.Status = (int) HttpStatusCode.BadRequest;
                 details.Errors.Add(ex.ParamName.ToCamelCase() ?? "Entity Not Found Error", [ex.Message]);
                 break;
 
@@ -91,13 +91,13 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case AuthenticationException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1";
                 details.Title = "Authentication Error";
-                details.Status = (int)HttpStatusCode.Unauthorized;
+                details.Status = (int) HttpStatusCode.Unauthorized;
                 details.Errors.Add("Authentication Error", [ex.Message]);
                 break;
             case SecurityTokenException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1";
                 details.Title = "Security Error";
-                details.Status = (int)HttpStatusCode.Unauthorized;
+                details.Status = (int) HttpStatusCode.Unauthorized;
                 details.Errors.Add("Security Error", [ex.Message]);
                 break;
 
@@ -108,7 +108,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case UnauthorizedAccessException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3";
                 details.Title = "Authorization Error";
-                details.Status = (int)HttpStatusCode.Forbidden;
+                details.Status = (int) HttpStatusCode.Forbidden;
                 details.Errors.Add("Authorization Error", [ex.Message]);
                 break;
 
@@ -119,13 +119,13 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case ConflictException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8";
                 details.Title = "Conflict Error";
-                details.Status = (int)HttpStatusCode.Conflict;
+                details.Status = (int) HttpStatusCode.Conflict;
                 details.Errors.Add("Conflict Error", [ex.Message]);
                 break;
             case InvalidOperationException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8";
                 details.Title = "Invalid Operation Error";
-                details.Status = (int)HttpStatusCode.Conflict;
+                details.Status = (int) HttpStatusCode.Conflict;
                 details.Errors.Add("Invalid Operation Error", [ex.Message]);
                 break;
 
@@ -136,7 +136,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case DbUpdateException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc4918#section-11.2";
                 details.Title = "Unprocessable Entity";
-                details.Status = (int)HttpStatusCode.UnprocessableEntity;
+                details.Status = (int) HttpStatusCode.UnprocessableEntity;
                 details.Errors.Add("Unprocessable Entity", [ex.Message]);
                 break;
 
@@ -147,7 +147,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case NotImplementedException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.2";
                 details.Title = "Not Implemented Error";
-                details.Status = (int)HttpStatusCode.NotImplemented;
+                details.Status = (int) HttpStatusCode.NotImplemented;
                 details.Errors.Add("Not Implemented Error", [ex.Message]);
                 break;
 
@@ -158,17 +158,22 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case IntegrationException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1";
                 details.Title = "Internal Server Error";
-                details.Status = (int)HttpStatusCode.InternalServerError;
+                details.Status = (int) HttpStatusCode.InternalServerError;
                 details.Errors.Add("Internal Server Error", [ex.Message]);
                 break;
             default:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1";
                 details.Title = "Internal Server Error";
-                details.Status = (int)HttpStatusCode.InternalServerError;
+                details.Status = (int) HttpStatusCode.InternalServerError;
                 details.Errors.Add("Internal Server Error", [exception.Message]);
                 break;
 
             #endregion
+        }
+
+        if (exception is BaseExceptionWithCode exceptionWithCode)
+        {
+            details.Extensions.Add("code", exceptionWithCode.Code.ToString());
         }
 
         context.Response.ContentType = "application/problem+json";
