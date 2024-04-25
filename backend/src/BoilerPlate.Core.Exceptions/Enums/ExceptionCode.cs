@@ -13,6 +13,10 @@ public enum ExceptionCode
     [Localization(Code = LanguageCodes.Russian, Value = "Объект с данным ID не найден")]
     Common_GetById_EntityNotFound,
 
+    [Localization(Code = LanguageCodes.English, Value = "Invalid sort string")]
+    [Localization(Code = LanguageCodes.Russian, Value = "Некорректная строка сортировки")]
+    Common_GetAll_InvalidSortString,
+
     #endregion
 
 #region System

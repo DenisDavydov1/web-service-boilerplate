@@ -39,9 +39,10 @@ public class FileStorageController : BaseApiController
     [HttpGet]
     [MinimumRoleAuthorize(UserRole.Viewer)]
     public async Task<ActionResult<GetAllDto<StoredFileDto>>> GetAllFilesInfoAsync(
-        [FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken ct)
+        [FromQuery] int? page, [FromQuery] int? resultsPerPage,
+        CancellationToken ct)
     {
-        var request = new GetAllRequest<StoredFile, StoredFileDto> { Page = page, PageSize = pageSize };
+        var request = new GetAllRequest<StoredFile, StoredFileDto> { Page = page, ResultsPerPage = resultsPerPage };
         var response = await Mediator.Send(request, ct);
         return response;
     }

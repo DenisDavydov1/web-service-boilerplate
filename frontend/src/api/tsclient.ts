@@ -70,11 +70,11 @@ export interface IStoredFileDTO {
 }
 
 export interface IStoredFileDTOGetAllDTO {
-  items: IStoredFileDTO[];
+  content: IStoredFileDTO[];
   page: number;
-  pageSize: number;
-  totalItems: number;
-  hasMore: boolean;
+  resultsPerPage: number;
+  totalResults: number;
+  isLast: boolean;
 }
 
 export interface IUpdateStoredFileDTO {
@@ -97,11 +97,11 @@ export interface IUserDTO {
 }
 
 export interface IUserDTOGetAllDTO {
-  items: IUserDTO[];
+  content: IUserDTO[];
   page: number;
-  pageSize: number;
-  totalItems: number;
-  hasMore: boolean;
+  resultsPerPage: number;
+  totalResults: number;
+  isLast: boolean;
 }
 
 export enum UserRole {

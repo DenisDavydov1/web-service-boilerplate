@@ -259,7 +259,7 @@
             }
           },
           {
-            "name": "pageSize",
+            "name": "resultsPerPage",
             "in": "query",
             "style": "form",
             "schema": {
@@ -520,12 +520,20 @@
             }
           },
           {
-            "name": "pageSize",
+            "name": "resultsPerPage",
             "in": "query",
             "style": "form",
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -871,15 +879,15 @@
       },
       "StoredFileDtoGetAllDto": {
         "required": [
-          "hasMore",
-          "items",
+          "content",
+          "isLast",
           "page",
-          "pageSize",
-          "totalItems"
+          "resultsPerPage",
+          "totalResults"
         ],
         "type": "object",
         "properties": {
-          "items": {
+          "content": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/StoredFileDto"
@@ -889,15 +897,15 @@
             "type": "integer",
             "format": "int32"
           },
-          "pageSize": {
+          "resultsPerPage": {
             "type": "integer",
             "format": "int32"
           },
-          "totalItems": {
+          "totalResults": {
             "type": "integer",
             "format": "int32"
           },
-          "hasMore": {
+          "isLast": {
             "type": "boolean"
           }
         },
@@ -980,15 +988,15 @@
       },
       "UserDtoGetAllDto": {
         "required": [
-          "hasMore",
-          "items",
+          "content",
+          "isLast",
           "page",
-          "pageSize",
-          "totalItems"
+          "resultsPerPage",
+          "totalResults"
         ],
         "type": "object",
         "properties": {
-          "items": {
+          "content": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UserDto"
@@ -998,15 +1006,15 @@
             "type": "integer",
             "format": "int32"
           },
-          "pageSize": {
+          "resultsPerPage": {
             "type": "integer",
             "format": "int32"
           },
-          "totalItems": {
+          "totalResults": {
             "type": "integer",
             "format": "int32"
           },
-          "hasMore": {
+          "isLast": {
             "type": "boolean"
           }
         },
