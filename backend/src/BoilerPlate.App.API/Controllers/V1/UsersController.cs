@@ -1,6 +1,4 @@
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 using BoilerPlate.App.API.Attributes;
 using BoilerPlate.Core.Exceptions.Factory;
 using BoilerPlate.Data.Abstractions.Enums;
@@ -10,13 +8,18 @@ using BoilerPlate.Data.DTO.Common.Responses;
 using BoilerPlate.Data.DTO.System.Users.Requests;
 using BoilerPlate.Data.DTO.System.Users.Responses;
 using BoilerPlate.Services.System.Users;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace BoilerPlate.App.API.Controllers;
+namespace BoilerPlate.App.API.Controllers.V1;
 
 /// <summary>
 /// Users controller
 /// </summary>
-[Route("api/users")]
+[ApiVersion(1)]
+[ApiExplorerSettings(GroupName = "v1")]
+[Route("api/v{version:apiVersion}/users")]
 public class UsersController : BaseApiController
 {
     private readonly IUsersService _usersService;

@@ -1,5 +1,4 @@
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 
 namespace BoilerPlate.App.API.Extensions;
 
@@ -9,7 +8,7 @@ namespace BoilerPlate.App.API.Extensions;
 public static class MvcExtensions
 {
     /// <summary> Add controllers </summary>
-    public static void AddControllersWithNormalizedEndpoints(this IServiceCollection services)
+    public static void AddControllersWithOptions(this IServiceCollection services)
     {
         services.AddControllers()
             .AddNewtonsoftJson(options =>
@@ -22,5 +21,16 @@ public static class MvcExtensions
             options.LowercaseUrls = true;
             options.LowercaseQueryStrings = true;
         });
+
+        services
+            .AddApiVersioning(o =>
+            {
+                o.ReportApiVersions = true;
+            })
+            .AddMvc()
+            .AddApiExplorer(o =>
+            {
+                o.SubstituteApiVersionInUrl = true;
+            });
     }
 }

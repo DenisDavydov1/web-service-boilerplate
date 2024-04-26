@@ -1,16 +1,20 @@
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
+using BoilerPlate.App.API.Constants;
 using BoilerPlate.Core.Exceptions.Factory;
 using BoilerPlate.Data.DTO.System.Authentication.Requests;
 using BoilerPlate.Data.DTO.System.Authentication.Responses;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace BoilerPlate.App.API.Controllers;
+namespace BoilerPlate.App.API.Controllers.V1;
 
 /// <summary>
 /// User authentication
 /// </summary>
-[Route("api/auth")]
+[ApiVersion(1)]
+[ApiExplorerSettings(GroupName = "v1")]
+[Route("api/v{version:apiVersion}/auth")]
 public class AuthenticationController : BaseApiController
 {
     /// <inheritdoc />

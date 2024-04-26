@@ -26,8 +26,7 @@ builder.Services.AddMappers();
 builder.Services.AddValidators();
 builder.Services.AddAuthentication(configuration);
 builder.Services.AddUserRoleAuthorization();
-builder.Services.AddControllersWithNormalizedEndpoints();
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllersWithOptions();
 builder.Services.AddHttpContextAccessor();
 builder.Services.SetDateTimeFormat();
 builder.Services.AddSwagger();
@@ -51,8 +50,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment() || app.Environment.IsLocal())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerWithUi();
 }
 
 // use middlewares

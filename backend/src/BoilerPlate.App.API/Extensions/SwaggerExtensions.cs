@@ -47,12 +47,27 @@ public static class SwaggerExtensions
                 }
             });
 
+            options.SwaggerDoc("v1", new OpenApiInfo { Version = "v1", Title = "API" });
+            options.SwaggerDoc("v2", new OpenApiInfo { Version = "v2", Title = "API" });
+
             options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             options.IncludeXmlComments(xmlPath);
         });
+
         services.AddSwaggerGenNewtonsoftSupport();
+    }
+
+    /// <summary> Use swagger UI </summary>
+    public static void UseSwaggerWithUi(this WebApplication app)
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(o =>
+        {
+            o.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            o.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
+        });
     }
 }

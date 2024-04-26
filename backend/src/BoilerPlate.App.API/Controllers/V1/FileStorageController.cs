@@ -1,6 +1,6 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 using BoilerPlate.App.API.Attributes;
+using BoilerPlate.App.API.Constants;
 using BoilerPlate.Core.Exceptions.Factory;
 using BoilerPlate.Data.Abstractions.Enums;
 using BoilerPlate.Data.Domain.Entities.System;
@@ -8,13 +8,17 @@ using BoilerPlate.Data.DTO.Common.Requests;
 using BoilerPlate.Data.DTO.Common.Responses;
 using BoilerPlate.Data.DTO.System.StoredFiles.Requests;
 using BoilerPlate.Data.DTO.System.StoredFiles.Responses;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
-namespace BoilerPlate.App.API.Controllers;
+namespace BoilerPlate.App.API.Controllers.V1;
 
 /// <summary>
 /// File storage controller
 /// </summary>
-[Route("api/file-storage")]
+[ApiVersion(1)]
+[ApiExplorerSettings(GroupName = "v1")]
+[Route("api/v{version:apiVersion}/file-storage")]
 public class FileStorageController : BaseApiController
 {
     /// <inheritdoc />

@@ -27,12 +27,12 @@ public class GetAllHandler<TEntity, TEntityDto>(
     {
         var query = unitOfWork.Repository<TEntity>().GetAllAsQueryable();
 
-        var totalItems = query.Count();
-
         if (string.IsNullOrWhiteSpace(request.Filter) == false)
         {
             query = Filter(query, request.Filter);
         }
+
+        var totalItems = query.Count();
 
         if (string.IsNullOrWhiteSpace(request.Sort) == false)
         {

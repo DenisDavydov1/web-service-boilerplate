@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using BoilerPlate.App.API.Attributes;
 using BoilerPlate.Core.Exceptions.Factory;
 using BoilerPlate.Core.Utils;
@@ -9,12 +10,14 @@ using Coravel.Queuing.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BoilerPlate.App.API.Controllers;
+namespace BoilerPlate.App.API.Controllers.V1;
 
 /// <summary>
 /// Test API methods
 /// </summary>
-[Route("api/tests")]
+[ApiVersion(1)]
+[ApiExplorerSettings(GroupName = "v1")]
+[Route("api/v{version:apiVersion}/tests")]
 public class TestsController : BaseApiController
 {
     private readonly IQueue _queue;
