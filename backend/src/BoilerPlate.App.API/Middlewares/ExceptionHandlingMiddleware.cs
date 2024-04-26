@@ -50,6 +50,9 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
                 details.Title = "One or more validation errors occurred.";
                 details.Status = (int) HttpStatusCode.BadRequest;
+                details.Detail = ex.Errors.Count() == 1 ?
+                    ex.Errors.FirstOrDefault()?.ErrorMessage
+                    : "One or more validation errors occurred.";
                 ex.Errors
                     .GroupBy(x => x.PropertyName)
                     .ToDictionary(
@@ -62,26 +65,29 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
                 details.Title = "One or more validation errors occurred.";
                 details.Status = (int) HttpStatusCode.BadRequest;
-                details.Errors.Add(ex.ParamName?.ToCamelCase() ?? "Validation Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add(ex.ParamName?.ToCamelCase() ?? "Validation error", [ex.Message]);
                 break;
             case BusinessException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
                 details.Title = "One or more validation errors occurred.";
                 details.Status = (int) HttpStatusCode.BadRequest;
+                details.Detail = ex.Message;
                 if (ex.ParameterNames?.Any() == true)
                 {
                     ex.ParameterNames.ToList().ForEach(p => details.Errors.Add(p.ToCamelCase(), [ex.Message]));
                 }
                 else
                 {
-                    details.Errors.Add("Validation Error", [ex.Message]);
+                    details.Errors.Add("Validation error", [ex.Message]);
                 }
                 break;
             case EntityNotFoundException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4";
-                details.Title = "Entity Not Found Error";
+                details.Title = "Entity not found.";
                 details.Status = (int) HttpStatusCode.BadRequest;
-                details.Errors.Add(ex.ParamName?.ToCamelCase() ?? "Entity Not Found Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add(ex.ParamName?.ToCamelCase() ?? "Entity not found error", [ex.Message]);
                 break;
 
             #endregion
@@ -90,15 +96,17 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
             case AuthenticationException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1";
-                details.Title = "Authentication Error";
+                details.Title = "Unauthorized.";
                 details.Status = (int) HttpStatusCode.Unauthorized;
-                details.Errors.Add("Authentication Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add("Authentication error", [ex.Message]);
                 break;
             case SecurityTokenException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1";
-                details.Title = "Security Error";
+                details.Title = "Unauthorized.";
                 details.Status = (int) HttpStatusCode.Unauthorized;
-                details.Errors.Add("Security Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add("Security token error", [ex.Message]);
                 break;
 
             #endregion
@@ -107,9 +115,10 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
             case UnauthorizedAccessException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3";
-                details.Title = "Authorization Error";
+                details.Title = "Forbidden.";
                 details.Status = (int) HttpStatusCode.Forbidden;
-                details.Errors.Add("Authorization Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add("Unauthorized access error", [ex.Message]);
                 break;
 
             #endregion
@@ -118,15 +127,17 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
             case ConflictException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8";
-                details.Title = "Conflict Error";
+                details.Title = "Conflict.";
                 details.Status = (int) HttpStatusCode.Conflict;
-                details.Errors.Add("Conflict Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add("Conflict error", [ex.Message]);
                 break;
             case InvalidOperationException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8";
-                details.Title = "Invalid Operation Error";
+                details.Title = "Invalid Operation.";
                 details.Status = (int) HttpStatusCode.Conflict;
-                details.Errors.Add("Invalid Operation Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add("Invalid operation error", [ex.Message]);
                 break;
 
             #endregion
@@ -135,9 +146,10 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
             case DbUpdateException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc4918#section-11.2";
-                details.Title = "Unprocessable Entity";
+                details.Title = "Unprocessable entity.";
                 details.Status = (int) HttpStatusCode.UnprocessableEntity;
-                details.Errors.Add("Unprocessable Entity", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add("Unprocessable entity error", [ex.Message]);
                 break;
 
             #endregion
@@ -146,9 +158,10 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
             case NotImplementedException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.2";
-                details.Title = "Not Implemented Error";
+                details.Title = "Not implemented.";
                 details.Status = (int) HttpStatusCode.NotImplemented;
-                details.Errors.Add("Not Implemented Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add("Not implemented error", [ex.Message]);
                 break;
 
             #endregion
@@ -157,15 +170,17 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
             case IntegrationException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1";
-                details.Title = "Internal Server Error";
+                details.Title = "Internal server error.";
                 details.Status = (int) HttpStatusCode.InternalServerError;
-                details.Errors.Add("Internal Server Error", [ex.Message]);
+                details.Detail = ex.Message;
+                details.Errors.Add("Integration error", [ex.Message]);
                 break;
             default:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1";
-                details.Title = "Internal Server Error";
+                details.Title = "Internal server error.";
                 details.Status = (int) HttpStatusCode.InternalServerError;
-                details.Errors.Add("Internal Server Error", [exception.Message]);
+                details.Detail = exception.Message;
+                details.Errors.Add("Internal server error", [exception.Message]);
                 break;
 
             #endregion
