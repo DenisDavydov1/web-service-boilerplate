@@ -4,12 +4,13 @@ namespace BoilerPlate.Core.Exceptions.Factory;
 
 public interface IExceptionFactory
 {
-    void ThrowIf<TException>(bool condition, ExceptionCode exceptionCode, params object?[] args)
+    void ThrowIf<TException>(bool condition, ExceptionCode exceptionCode,
+        object?[]? args = null, object?[]? formatArgs = null)
         where TException : Exception;
 
-    void Throw<TException>(ExceptionCode exceptionCode, params object?[] args)
+    void Throw<TException>(ExceptionCode exceptionCode, object?[]? args = null, object?[]? formatArgs = null)
         where TException : Exception;
 
-    TException Get<TException>(ExceptionCode exceptionCode, params object?[] args)
+    TException Get<TException>(ExceptionCode exceptionCode, object?[]? args = null, object?[]? formatArgs = null)
         where TException : Exception;
 }

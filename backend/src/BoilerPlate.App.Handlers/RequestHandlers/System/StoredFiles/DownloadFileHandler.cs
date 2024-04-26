@@ -33,7 +33,7 @@ public class DownloadFileHandler : IRequestHandler<DownloadFileRequest, Download
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             storedFile == null,
             ExceptionCode.System_StoredFiles_DownloadFile_StoredFileNotFound,
-            nameof(request.Id));
+            args: [nameof(request.Id)]);
 
         var fileName = storedFile!.Id + Path.GetExtension(storedFile.Name);
         var filePath = Path.Combine(_fileStorageOptions.RootDirectory, fileName);
@@ -41,7 +41,7 @@ public class DownloadFileHandler : IRequestHandler<DownloadFileRequest, Download
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             File.Exists(filePath) == false,
             ExceptionCode.System_StoredFiles_DownloadFile_FileNotFound,
-            nameof(request.Id));
+            args: [nameof(request.Id)]);
 
         var bytes = await File.ReadAllBytesAsync(filePath, ct);
         var isContentTypeFound = new FileExtensionContentTypeProvider()

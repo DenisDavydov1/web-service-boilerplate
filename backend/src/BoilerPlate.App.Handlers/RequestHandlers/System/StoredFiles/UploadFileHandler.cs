@@ -41,7 +41,7 @@ public class UploadFileHandler : IRequestHandler<UploadFileRequest, IdDto>
         _exceptionFactory.ThrowIf<BusinessException>(
             filePath.Length > MaxPathLength,
             ExceptionCode.System_StoredFiles_UploadFile_MaxPathLengthExceeded,
-            nameof(request.File));
+            args: [nameof(request.File)]);
 
         await using var stream = new FileStream(filePath, FileMode.Create);
         await request.File.CopyToAsync(stream, ct);

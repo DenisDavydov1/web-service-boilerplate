@@ -36,7 +36,9 @@ public class ChangeUserPasswordHandler : IRequestHandler<ChangeUserPasswordDto, 
         _exceptionFactory.ThrowIf<BusinessException>(
             isOldPasswordValid == false,
             ExceptionCode.System_Users_ChangeUserPassword_OldPasswordInvalid,
-            nameof(request.OldPassword));
+            args: [nameof(request.OldPassword)]);
+
+        var s = string.Format("{Name} sdf", "kek");
 
         user.PasswordHash = HashingUtils.HashBCrypt(request.NewPassword);
 

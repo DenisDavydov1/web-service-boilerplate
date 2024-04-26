@@ -40,18 +40,18 @@ public class RefreshAccessTokenHandler : IRequestHandler<RefreshAccessTokenDto, 
         _exceptionFactory.ThrowIf<BusinessException>(
             userId == null || jti == null || exp == null,
             ExceptionCode.System_Authentication_RefreshAccessToken_InvalidRefreshToken,
-            nameof(request.RefreshToken));
+            args: [nameof(request.RefreshToken)]);
 
         var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId!.Value, ct);
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             user == null || user.IsDeleted,
             ExceptionCode.System_Authentication_RefreshAccessToken_UserNotFound,
-            nameof(request.RefreshToken));
+            args: [nameof(request.RefreshToken)]);
 
         _exceptionFactory.ThrowIf<BusinessException>(
             user!.RefreshTokenId != jti || user.RefreshTokenExpiresAt != exp,
             ExceptionCode.System_Authentication_RefreshAccessToken_InvalidRefreshToken,
-            nameof(request.RefreshToken));
+            args: [nameof(request.RefreshToken)]);
 
         var accessToken = JwtUtils.GenerateAccessToken(_jwtOptions, user);
         var refreshToken = JwtUtils.GenerateRefreshToken(_jwtOptions, user);

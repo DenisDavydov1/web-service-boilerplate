@@ -34,13 +34,13 @@ public class GetAccessTokenHandler : IRequestHandler<GetAccessTokenDto, JwtToken
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             user == null || user.IsDeleted,
             ExceptionCode.System_Authentication_GetAccessToken_UserNotFound,
-            nameof(request.Login));
+            args: [nameof(request.Login)]);
 
         var isValidPassword = HashingUtils.VerifyBCrypt(request.Password, user!.PasswordHash);
         _exceptionFactory.ThrowIf<BusinessException>(
             !isValidPassword,
             ExceptionCode.System_Authentication_GetAccessToken_PasswordInvalid,
-            nameof(request.Password));
+            args: [nameof(request.Password)]);
 
         var accessToken = JwtUtils.GenerateAccessToken(_jwtOptions, user);
         var refreshToken = JwtUtils.GenerateRefreshToken(_jwtOptions, user);

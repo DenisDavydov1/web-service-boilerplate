@@ -9,8 +9,8 @@ public enum ExceptionCode
 {
     #region Common
 
-    [Localization(Code = LanguageCodes.English, Value = "Entity with this ID not found")]
-    [Localization(Code = LanguageCodes.Russian, Value = "Объект с данным ID не найден")]
+    [Localization(Code = LanguageCodes.English, Value = "Entity {0} with ID {1} not found")]
+    [Localization(Code = LanguageCodes.Russian, Value = "Объект {0} с ID {1} не найден")]
     Common_GetById_EntityNotFound,
 
     #endregion

@@ -34,7 +34,7 @@ public class DeleteFileHandler : IRequestHandler<DeleteByIdRequest<StoredFile>, 
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             storedFile == null,
             ExceptionCode.System_StoredFiles_DeleteFile_StoredFileNotFound,
-            nameof(request.Id));
+            args: [nameof(request.Id)]);
 
         var fileName = storedFile!.Id + Path.GetExtension(storedFile.Name);
         var filePath = Path.Combine(_fileStorageOptions.RootDirectory, fileName);
@@ -53,7 +53,7 @@ public class DeleteFileHandler : IRequestHandler<DeleteByIdRequest<StoredFile>, 
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             isFileExist == false,
             ExceptionCode.System_StoredFiles_DeleteFile_FileNotFound,
-            nameof(request.Id));
+            args: [nameof(request.Id)]);
 
         return _mapper.Map<IdDto>(storedFile);
     }

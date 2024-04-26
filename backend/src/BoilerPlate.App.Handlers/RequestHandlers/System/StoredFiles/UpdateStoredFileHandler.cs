@@ -29,7 +29,7 @@ public class UpdateStoredFileHandler : IRequestHandler<UpdateStoredFileDto, IdDt
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             storedFile == null,
             ExceptionCode.System_StoredFiles_UpdateStoredFile_StoredFileNotFound,
-            nameof(request.Id));
+            args: [nameof(request.Id)]);
 
         _mapper.Map(request, storedFile);
 

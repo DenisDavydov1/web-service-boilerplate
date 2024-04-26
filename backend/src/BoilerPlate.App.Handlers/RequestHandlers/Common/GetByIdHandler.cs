@@ -31,7 +31,8 @@ public class GetByIdHandler<TEntity, TDto> : IRequestHandler<GetByIdRequest<TEnt
         _exceptionFactory.ThrowIf<EntityNotFoundException>(
             entity == null,
             ExceptionCode.Common_GetById_EntityNotFound,
-            nameof(request.Id));
+            args: [nameof(request.Id)],
+            formatArgs: [typeof(TEntity).Name, request.Id]);
 
         return _mapper.Map<TDto>(entity);
     }

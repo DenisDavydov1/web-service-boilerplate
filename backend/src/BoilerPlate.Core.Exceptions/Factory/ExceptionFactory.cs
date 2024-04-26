@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using BoilerPlate.Core.Constants;
 using BoilerPlate.Core.Exceptions.Enums;
@@ -13,23 +14,31 @@ internal class ExceptionFactory(IHttpContextAccessor httpContextAccessor) : IExc
         httpContextAccessor.HttpContext?.User.FindFirstValue(LanguageCodes.ClaimLanguageCode)
         ?? LanguageCodes.English;
 
-    public void ThrowIf<TException>(bool condition, ExceptionCode exceptionCode, params object?[] args)
+    public void ThrowIf<TException>(bool condition, ExceptionCode exceptionCode,
+        object?[]? args = null, object?[]? formatArgs = null)
         where TException : Exception
     {
         if (condition)
         {
-            Throw<TException>(exceptionCode, args);
+            Throw<TException>(exceptionCode, args, formatArgs);
         }
     }
 
-    public void Throw<TException>(ExceptionCode exceptionCode, params object?[] args)
-        where TException : Exception
-        => throw Get<TException>(exceptionCode, args);
+    public void Throw<TException>(ExceptionCode exceptionCode, object?[]? args = null, object?[]? formatArgs = null)
+        where TException : Exception =>
+        throw Get<TException>(exceptionCode, args, formatArgs);
 
-    public TException Get<TException>(ExceptionCode exceptionCode, params object?[] args)
+    public TException Get<TException>(ExceptionCode exceptionCode, object?[]? args = null, object?[]? formatArgs = null)
         where TException : Exception
     {
-        var exceptionText = exceptionCode.GetText(_languageCode);
+        args ??= [];
+        var formatArguments = new List<object?>(formatArgs ?? []);
+
+        var exceptionTextTemplate = exceptionCode.GetText(_languageCode);
+        var templateVariablesCountRegex = new Regex("({[^{}]+})(?=[^}])");
+        var variablesCount = templateVariablesCountRegex.Matches(exceptionTextTemplate).Count;
+        formatArguments.AddRange(Enumerable.Repeat<object?>(null, variablesCount - formatArguments.Count));
+        var exceptionText = string.Format(exceptionTextTemplate, formatArguments.ToArray());
         var argsWithText = args.Prepend(exceptionText).ToArray();
 
         TException? exception;

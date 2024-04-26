@@ -37,7 +37,7 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserDto, IdDto>
         _exceptionFactory.ThrowIf<BusinessException>(
             isUserExist,
             ExceptionCode.System_Users_RegisterUser_LoginTaken,
-            nameof(request.Login));
+            args: [nameof(request.Login)]);
 
         var user = _mapper.Map<User>(request);
         user.Role = UserRole.User;
