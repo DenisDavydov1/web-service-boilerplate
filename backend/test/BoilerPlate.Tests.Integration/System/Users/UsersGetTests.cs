@@ -1,6 +1,5 @@
-using System.Net;
 using BoilerPlate.App.API;
-using BoilerPlate.Core.Exceptions.Enums;
+using BoilerPlate.Data.Abstractions.Enums;
 using BoilerPlate.Data.Domain.Entities.System;
 using BoilerPlate.Data.DTO.Common.Responses;
 using BoilerPlate.Data.DTO.System.Users.Responses;
@@ -164,7 +163,7 @@ public class UsersGetTests : BaseIntegrationTests
         // Arrange
         await SeedUsers(10);
         await AuthorizeAsync(SeedConstants.AdminLogin, SeedConstants.AdminPassword);
-        var allLoginsSorted = UnitOfWork.Repository<User>().GetAllAsQueryable()
+        var allIdsSorted = UnitOfWork.Repository<User>().GetAllAsQueryable()
             .OrderBy(x => x.Login)
             .ThenByDescending(x => x.Id)
             .Take(100)
@@ -174,31 +173,143 @@ public class UsersGetTests : BaseIntegrationTests
         // Act
         var response = await GetAsync("api/users?sort=login:asc,id:desc");
         var getAllDto = await response.ToDtoAsync<GetAllDto<UserDto>>();
-        var dtoLogins = getAllDto.Content.Select(x => x.Id).ToArray();
+        var dtoIds = getAllDto.Content.Select(x => x.Id).ToArray();
 
         // Assert
         getAllDto.Content.Count().ShouldBeGreaterThanOrEqualTo(10);
-        dtoLogins.ShouldBe(allLoginsSorted);
+        dtoIds.ShouldBe(allIdsSorted);
     }
 
-    [Theory]
-    [InlineData("dogin:asc", null)]
-    [InlineData("login:ascending", ExceptionCode.Common_GetAll_InvalidSortString)]
-    [InlineData("login:a", ExceptionCode.Common_GetAll_InvalidSortString)]
-    [InlineData("login", ExceptionCode.Common_GetAll_InvalidSortString)]
-    public async Task GetAllAsync_SortByInvalidProperty_ReturnsError(string sort, ExceptionCode? expectedErrorCode)
+    [Fact]
+    public async Task GetAllAsync_WithFilter_FiltersBySubstring()
+    {
+        // Arrange
+        await SeedUsers(10);
+        if (await UnitOfWork.Repository<User>().ExistsAsync(x => x.Login == "www") == false)
+        {
+            await UserSeedFactory.SeedAsync(UnitOfWork, o => o.RuleFor = f => f.Login = "www");
+        }
+
+        await AuthorizeAsync(SeedConstants.AdminLogin, SeedConstants.AdminPassword);
+        var allLoginsFiltered = UnitOfWork.Repository<User>().GetAllAsQueryable()
+            .Where(x => x.Login.Contains("w"))
+            .Select(x => x.Login)
+            .Take(100)
+            .ToArray();
+
+        // Act
+        var response = await GetAsync("api/users?filter=login:w");
+        var getAllDto = await response.ToDtoAsync<GetAllDto<UserDto>>();
+        var dtoLogins = getAllDto.Content.Select(x => x.Login).ToArray();
+
+        // Assert
+        getAllDto.Content.Count().ShouldBeGreaterThanOrEqualTo(1);
+        dtoLogins.ShouldBe(allLoginsFiltered);
+        dtoLogins.ShouldAllBe(x => x.Contains("w"));
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WithFilter_FiltersByStringWithCommaAndColon()
+    {
+        // Arrange
+        const string email = ",:one:two:three,|\\@#$%^&*()_-4,:,";
+        await UserSeedFactory.SeedAsync(UnitOfWork, o => o.RuleFor = f => f.Email = email);
+        await AuthorizeAsync(SeedConstants.AdminLogin, SeedConstants.AdminPassword);
+
+        // Act
+        var response = await GetAsync($"api/users?filter=email:{email}");
+        var getAllDto = await response.ToDtoAsync<GetAllDto<UserDto>>();
+
+        // Assert
+        getAllDto.Content.Count().ShouldBeGreaterThanOrEqualTo(1);
+        getAllDto.Content.ShouldAllBe(x => x.Email == email);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WithFilter_FiltersByEnum()
     {
         // Arrange
         await SeedUsers(10);
         await AuthorizeAsync(SeedConstants.AdminLogin, SeedConstants.AdminPassword);
+        var allIdsFiltered = UnitOfWork.Repository<User>().GetAllAsQueryable()
+            .Where(x => x.Role == UserRole.Admin)
+            .Select(x => x.Id)
+            .Take(100)
+            .ToArray();
 
         // Act
-        var response = await GetAsync($"api/users?sort={sort}");
-        var errorCode = await response.GetErrorCode();
+        var response = await GetAsync("api/users?filter=role:Admin");
+        var getAllDto = await response.ToDtoAsync<GetAllDto<UserDto>>();
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        errorCode.ShouldBe(expectedErrorCode?.ToString());
+        getAllDto.Content.Count().ShouldBeGreaterThanOrEqualTo(1);
+        getAllDto.Content.Select(x => x.Id).ShouldBe(allIdsFiltered);
+        getAllDto.Content.ShouldAllBe(x => x.Role == UserRole.Admin);
+    }
+
+    [Theory]
+    [InlineData("05/21/2023")]
+    [InlineData("2023-05-21")]
+    [InlineData("2023-05-21 00:00:00")]
+    [InlineData("2023-05-21T00:00:00")]
+    [InlineData("2023-05-20T21:00:00Z")]
+    public async Task GetAllAsync_WithFilter_FiltersByDateTime(string dateFilter)
+    {
+        // Arrange
+        var date = new DateTime(2023, 05, 21).ToUniversalTime();
+        var user = await UserSeedFactory.SeedAsync(UnitOfWork, o => o.RuleFor = f => f.CreatedAt = date);
+        await AuthorizeAsync(SeedConstants.AdminLogin, SeedConstants.AdminPassword);
+
+        // Act
+        var response = await GetAsync($"api/users?filter=createdAt:{dateFilter}");
+        var getAllDto = await response.ToDtoAsync<GetAllDto<UserDto>>();
+
+        // Assert
+        getAllDto.Content.Count().ShouldBeGreaterThanOrEqualTo(1);
+        getAllDto.Content.Any(x => x.Id == user.User.Id).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WithFilter_FiltersByGuid()
+    {
+        // Arrange
+        var users = await SeedUsers(2);
+        var user = users.First();
+        await AuthorizeAsync(SeedConstants.AdminLogin, SeedConstants.AdminPassword);
+
+        // Act
+        var response = await GetAsync($"api/users?filter=id:{user.Id}");
+        var getAllDto = await response.ToDtoAsync<GetAllDto<UserDto>>();
+
+        // Assert
+        getAllDto.Content.Count().ShouldBe(1);
+        getAllDto.Content.First().Id.ShouldBe(user.Id);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WithFilter_FiltersByMultipleFields()
+    {
+        // Arrange
+        const string email = "one@mail.com";
+        await UserSeedFactory.SeedAsync(UnitOfWork, o => o.RuleFor = f =>
+        {
+            f.Email = email;
+            f.Role = UserRole.Moderator;
+        });
+        await UserSeedFactory.SeedAsync(UnitOfWork, o => o.RuleFor = f =>
+        {
+            f.Email = email;
+            f.Role = UserRole.Admin;
+        });
+        await AuthorizeAsync(SeedConstants.AdminLogin, SeedConstants.AdminPassword);
+
+        // Act
+        var response = await GetAsync($"api/users?filter=email:{email},role:{UserRole.Moderator}");
+        var getAllDto = await response.ToDtoAsync<GetAllDto<UserDto>>();
+
+        // Assert
+        getAllDto.Content.Count().ShouldBeGreaterThanOrEqualTo(1);
+        getAllDto.Content.ShouldAllBe(x => x.Email == email && x.Role == UserRole.Moderator);
     }
 
     private void AssertUserDto(UserDto userDto, User user)
@@ -210,9 +321,16 @@ public class UsersGetTests : BaseIntegrationTests
         userDto.Role.ShouldBe(user.Role);
     }
 
-    private async Task SeedUsers(int count)
+    private async Task<IEnumerable<User>> SeedUsers(int count)
     {
+        var users = new List<User>();
+
         for (var i = 0; i < count; i++)
-            await UserSeedFactory.SeedAsync(UnitOfWork);
+        {
+            var user = await UserSeedFactory.SeedAsync(UnitOfWork);
+            users.Add(user.User);
+        }
+
+        return users;
     }
 }

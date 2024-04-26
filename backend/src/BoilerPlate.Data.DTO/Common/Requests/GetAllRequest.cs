@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 using BoilerPlate.Data.Domain.Entities.Base;
 using BoilerPlate.Data.DTO.Base;
 using BoilerPlate.Data.DTO.Common.Responses;
@@ -19,8 +18,9 @@ public class GetAllRequest<TEntity, TEntityDto> : IRequest<GetAllDto<TEntityDto>
     /// <summary> Page size </summary>
     public int? ResultsPerPage { get; set; }
 
-    /// <summary> Custom query filter </summary>
-    public Expression<Func<TEntity, bool>>? Filter { get; set; }
+    /// <summary> Query filter string </summary>
+    /// <example> firstName:Ivan,age:22 </example>
+    public string? Filter { get; set; }
 
     /// <summary> Sort string </summary>
     /// <example> firstName:asc,age:desc </example>

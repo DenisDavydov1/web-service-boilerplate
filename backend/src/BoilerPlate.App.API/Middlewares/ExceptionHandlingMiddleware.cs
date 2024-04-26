@@ -62,7 +62,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
                 details.Title = "One or more validation errors occurred.";
                 details.Status = (int) HttpStatusCode.BadRequest;
-                details.Errors.Add(ex.ParamName.ToCamelCase() ?? "Validation Error", [ex.Message]);
+                details.Errors.Add(ex.ParamName?.ToCamelCase() ?? "Validation Error", [ex.Message]);
                 break;
             case BusinessException ex:
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
@@ -81,7 +81,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 details.Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4";
                 details.Title = "Entity Not Found Error";
                 details.Status = (int) HttpStatusCode.BadRequest;
-                details.Errors.Add(ex.ParamName.ToCamelCase() ?? "Entity Not Found Error", [ex.Message]);
+                details.Errors.Add(ex.ParamName?.ToCamelCase() ?? "Entity Not Found Error", [ex.Message]);
                 break;
 
             #endregion

@@ -53,14 +53,15 @@ public class UsersController : BaseApiController
     [MinimumRoleAuthorize(UserRole.Moderator)]
     public async Task<ActionResult<GetAllDto<UserDto>>> GetAllAsync(
         [FromQuery] int? page, [FromQuery] int? resultsPerPage,
-        [FromQuery] string? sort,
+        [FromQuery] string? sort, [FromQuery] string? filter,
         CancellationToken ct)
     {
         var request = new GetAllRequest<User, UserDto>
         {
             Page = page,
             ResultsPerPage = resultsPerPage,
-            Sort = sort
+            Sort = sort,
+            Filter = filter
         };
 
         var response = await Mediator.Send(request, ct);

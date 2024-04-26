@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using AutoMapper;
@@ -11,34 +11,28 @@ using BoilerPlate.Data.Domain.Entities.Base;
 using BoilerPlate.Data.DTO.Base;
 using BoilerPlate.Data.DTO.Common.Requests;
 using BoilerPlate.Data.DTO.Common.Responses;
-using CaseExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoilerPlate.App.Handlers.RequestHandlers.Common;
 
-public partial class GetAllHandler<TEntity, TEntityDto> : IRequestHandler<GetAllRequest<TEntity, TEntityDto>, GetAllDto<TEntityDto>>
+public class GetAllHandler<TEntity, TEntityDto>(
+    IMapper mapper,
+    IUnitOfWork unitOfWork)
+    : IRequestHandler<GetAllRequest<TEntity, TEntityDto>, GetAllDto<TEntityDto>>
     where TEntity : BaseEntity
     where TEntityDto : BaseEntityDto
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
-    private readonly IExceptionFactory _exceptionFactory;
-
-    public GetAllHandler(IMapper mapper, IUnitOfWork unitOfWork, IExceptionFactory exceptionFactory)
-    {
-        _mapper = mapper;
-        _unitOfWork = unitOfWork;
-        _exceptionFactory = exceptionFactory;
-    }
-
     public async Task<GetAllDto<TEntityDto>> Handle(GetAllRequest<TEntity, TEntityDto> request, CancellationToken ct)
     {
-        var query = _unitOfWork.Repository<TEntity>()
-            .GetAllAsQueryable()
-            .WhereIf(request.Filter != null, request.Filter!);
+        var query = unitOfWork.Repository<TEntity>().GetAllAsQueryable();
 
         var totalItems = query.Count();
+
+        if (string.IsNullOrWhiteSpace(request.Filter) == false)
+        {
+            query = Filter(query, request.Filter);
+        }
 
         if (string.IsNullOrWhiteSpace(request.Sort) == false)
         {
@@ -52,7 +46,7 @@ public partial class GetAllHandler<TEntity, TEntityDto> : IRequestHandler<GetAll
             .Take(resultsPerPage)
             .ToListAsync(ct);
 
-        var dtos = _mapper.Map<IEnumerable<TEntityDto>>(entities);
+        var dtos = mapper.Map<IEnumerable<TEntityDto>>(entities);
 
         return new GetAllDto<TEntityDto>
         {
@@ -64,18 +58,103 @@ public partial class GetAllHandler<TEntity, TEntityDto> : IRequestHandler<GetAll
         };
     }
 
-    [GeneratedRegex(@"(.+:(asc|desc))(\,|$)\b")]
-    private static partial Regex SortRegex();
+    private IQueryable<TEntity> Filter(IQueryable<TEntity> query, string filter)
+    {
+        var filterRegex = new Regex("([^,:]+:.+?)(?=,[^,:]+:.+|$)");
+        var filterFields = filterRegex.Matches(filter)
+            .Select(x => x.Value.Split(':', 2))
+            .ToDictionary(k => k[0], v => v[1]);
+
+        foreach (var (fieldName, filterValue) in filterFields)
+        {
+            var parameterExpr = Expression.Parameter(typeof(TEntity));
+            var propertyExpr = Expression.Property(parameterExpr, fieldName);
+
+            Expression exprBody;
+
+            if (propertyExpr.Type == typeof(bool))
+            {
+                var filterBoolValue = bool.Parse(filterValue);
+                var filterValueExpr = Expression.Constant(filterBoolValue, typeof(bool));
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else if (propertyExpr.Type == typeof(decimal))
+            {
+                var filterDecimalValue = decimal.Parse(filterValue);
+                var filterValueExpr = Expression.Constant(filterDecimalValue, typeof(decimal));
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else if (propertyExpr.Type == typeof(int))
+            {
+                var filterIntValue = int.Parse(filterValue);
+                var filterValueExpr = Expression.Constant(filterIntValue, typeof(int));
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else if (propertyExpr.Type == typeof(long))
+            {
+                var filterLongValue = long.Parse(filterValue);
+                var filterValueExpr = Expression.Constant(filterLongValue, typeof(long));
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else if (propertyExpr.Type == typeof(float))
+            {
+                var filterFloatValue = float.Parse(filterValue);
+                var filterValueExpr = Expression.Constant(filterFloatValue, typeof(float));
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else if (propertyExpr.Type == typeof(double))
+            {
+                var filterDoubleValue = double.Parse(filterValue);
+                var filterValueExpr = Expression.Constant(filterDoubleValue, typeof(double));
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else if (propertyExpr.Type == typeof(string))
+            {
+                var methodInfo = typeof(string).GetMethod("Contains", [typeof(string)])!;
+                var filterValueExpr = Expression.Constant(filterValue, typeof(string));
+                exprBody = Expression.Call(propertyExpr, methodInfo, filterValueExpr);
+            }
+            else if (propertyExpr.Type.IsEnum)
+            {
+                var filterEnumValue = Enum.Parse(propertyExpr.Type, filterValue);
+                var filterValueExpr = Expression.Constant(filterEnumValue, propertyExpr.Type);
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else if (propertyExpr.Type == typeof(DateTime))
+            {
+                var filterDateTimeValue = DateTime.Parse(filterValue, CultureInfo.InvariantCulture,
+                    DateTimeStyles.RoundtripKind);
+                if (filterDateTimeValue.Kind != DateTimeKind.Utc)
+                {
+                    filterDateTimeValue = filterDateTimeValue.ToUniversalTime();
+                }
+
+                var filterValueExpr = Expression.Constant(filterDateTimeValue, typeof(DateTime));
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else if (propertyExpr.Type == typeof(Guid))
+            {
+                var filterGuidValue = Guid.Parse(filterValue);
+                var filterValueExpr = Expression.Constant(filterGuidValue, typeof(Guid));
+                exprBody = Expression.Equal(propertyExpr, filterValueExpr);
+            }
+            else
+            {
+                continue;
+            }
+
+            var lambdaExpr = Expression.Lambda<Func<TEntity, bool>>(exprBody, parameterExpr);
+            query = query.Where(lambdaExpr);
+        }
+
+        return query;
+    }
 
     private IOrderedQueryable<TEntity> Sort(IQueryable<TEntity> query, string sort)
     {
-        var sortRegex = SortRegex();
-        _exceptionFactory.ThrowIf<BusinessException>(
-            sortRegex.IsMatch(sort) == false,
-            ExceptionCode.Common_GetAll_InvalidSortString);
-
-        var sortFields = sort.Split(',')
-            .Select(x => x.Split(':'))
+        var sortRegex = new Regex("([^,:]+:(?:asc|desc))(?=,|$)");
+        var sortFields = sortRegex.Matches(sort)
+            .Select(x => x.Value.Split(':', 2))
             .ToDictionary(k => k[0], v => v[1]);
 
         var orderedQueryable = query.OrderBy(_ => 0);
