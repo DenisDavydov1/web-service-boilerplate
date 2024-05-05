@@ -32,6 +32,10 @@
       <DependentUpon>appsettings.json</DependentUpon>
     </Content>
     <Content Remove="Swagger/**" />
+    <Content Include="..\..\..\configs\backend\appsettings.Production.json">
+      <Link>appsettings.Production.json</Link>
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -51,7 +55,7 @@
     <MakeDir Directories="Swagger" Condition="!Exists('Swagger')" />
     <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Local;SWAGGER_GEN=true" Command="dotnet swagger tofile --output Swagger/swagger.json $(TargetPath) v1" ContinueOnError="WarnAndContinue" />
     <MakeDir Directories="../../../frontend/src/api/contracts" Condition="!Exists('../../../frontend/src/api/contracts')" />
-    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet run --project ../BoilerPlate.Utils.TsClientGenerator/BoilerPlate.Utils.TsClientGenerator.csproj Swagger/swagger.json ../../../frontend/src/api/tsclient.ts" ContinueOnError="WarnAndContinue" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet run --project ../BoilerPlate.Utils.TsClientGenerator/BoilerPlate.Utils.TsClientGenerator.csproj Swagger/swagger.json ../../../frontend/contracts.ts" ContinueOnError="WarnAndContinue" />
   </Target>
 
 </Project>

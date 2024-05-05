@@ -105,10 +105,8 @@ $RECYCLE.BIN/
 [Oo]bj/
 _UpgradeReport_Files/
 [Pp]ackages/
-#appsettings.Local.json
-#appsettings.Test.json
+appsettings.Local.json
+appsettings.Test.json
 
 # Devops
-file-storage-root
-kafka-data
-certbot
+data

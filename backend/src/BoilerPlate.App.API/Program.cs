@@ -12,8 +12,11 @@ using BoilerPlate.Data.DAL.Extensions;
 using BoilerPlate.Data.Seeds.Extensions;
 using BoilerPlate.Services.Kafka.Extensions;
 using BoilerPlate.Services.System.Extensions;
+using Microsoft.AspNetCore.HttpLogging;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.ConfigureServiceProvider();
+
 var configuration = builder.Configuration;
 
 if (builder.Environment.IsLocal() || builder.Environment.IsTest())
@@ -32,34 +35,35 @@ builder.Services.SetDateTimeFormat();
 builder.Services.AddSwagger();
 builder.Services.AddExceptions();
 builder.Services.AddJobs();
+builder.Services.AddHttpLogging(o =>
+{
+    o.MediaTypeOptions.AddText("application/json");
+    o.MediaTypeOptions.AddText("multipart/form-data");
+    o.MediaTypeOptions.AddText("application/x-www-form-urlencoded");
+    o.LoggingFields = HttpLoggingFields.All;
+});
 
 if (configuration.IsFileStorageEnabled())
     builder.Services.AddFileStorage(configuration);
 
-// add boilerPlate.services
 builder.Services.AddSystemServices();
 
 if (configuration.IsKafkaEnabled() && EnvUtils.IsSwaggerGen == false)
     builder.Services.AddKafka(builder.Configuration);
 
-// add middlewares
 builder.Services.AddScoped<ExceptionHandlingMiddleware>();
 builder.Services.AddScoped<JwtValidationMiddleware>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment() || app.Environment.IsLocal())
-{
-    app.UseSwaggerWithUi();
-}
-
-// use middlewares
+app.UseSwaggerWithUi();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<JwtValidationMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.UseHttpLogging();
 
 if (EnvUtils.IsSwaggerGen == false)
 {

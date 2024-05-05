@@ -1,0 +1,203 @@
+version: "3.8"
+
+networks:
+  boiler-plate-network:
+    driver: bridge
+
+services:
+  nginx:
+    image: boiler-plate/nginx:latest
+    build:
+      context: .
+      args:
+        - BOILER_PLATE_ENVIRONMENT=${BOILER_PLATE_ENVIRONMENT}
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - boiler-plate-network
+
+  postgres:
+    image: postgres:16.0-alpine3.18
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 4321:5432
+    volumes:
+      - ${BOILER_PLATE_APP_DATA_PATH}/postgres:/var/lib/postgresql/data:rw
+    networks:
+      - boiler-plate-network
+
+  backend:
+    image: boiler-plate/backend:latest
+    build:
+      context:
+        backend
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: ${BOILER_PLATE_POSTGRES_CONNECTION}
+      Jwt__PublicKey: ${BOILER_PLATE_JWT_PUBLIC_KEY}
+      Jwt__PrivateKey: ${BOILER_PLATE_JWT_PRIVATE_KEY}
+    volumes:
+      - ./configs/backend/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ${BOILER_PLATE_APP_DATA_PATH}/file-storage:/app/file-storage:rw
+    depends_on:
+      - postgres
+    networks:
+      - boiler-plate-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    restart: always
+    ports:
+      - 9091:9091
+    environment:
+      KAFKA_LISTENERS: BROKER://kafka:29091,EXTERNAL://0.0.0.0:9091,CONTROLLER://kafka:19091
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka:29091,EXTERNAL://localhost:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_PROCESS_ROLES: 'controller,broker'
+      KAFKA_NODE_ID: 0
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '0@kafka:19091'
+      KAFKA_JMX_PORT: 9991
+      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9991
+      CLUSTER_ID: ${BOILER_PLATE_KAFKA_CLUSTER_ID}
+    volumes:
+      - ${BOILER_PLATE_APP_DATA_PATH}/kafka/logs:/tmp/kafka-logs
+      - ${BOILER_PLATE_APP_DATA_PATH}/kafka/data:/var/lib/kafka/data
+      - ${BOILER_PLATE_APP_DATA_PATH}/kafka/secrets:/etc/kafka/secrets
+    networks:
+      - boiler-plate-network
+
+  kafka-ui:
+    image: 'provectuslabs/kafka-ui:latest'
+    restart: always
+    depends_on:
+      - kafka
+    ports:
+      - 18080:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: kafka
+      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:29091
+      KAFKA_CLUSTERS_0_METRICS_PORT: 9991
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      AUTH_TYPE: LOGIN_FORM
+      SPRING_SECURITY_USER_NAME: kafka-ui-admin
+      SPRING_SECURITY_USER_PASSWORD: Admin321
+    networks:
+      - boiler-plate-network
+
+  # kafka1:
+  #   image: confluentinc/cp-kafka:7.5.0
+  #   restart: always
+  #   ports:
+  #     - 9091:9091
+  #   environment:
+  #     KAFKA_LISTENERS: BROKER://kafka1:29091,EXTERNAL://0.0.0.0:9091,CONTROLLER://kafka1:19091
+  #     KAFKA_ADVERTISED_LISTENERS: BROKER://kafka1:29091,EXTERNAL://localhost:9091
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  #     KAFKA_PROCESS_ROLES: 'controller,broker'
+  #     KAFKA_NODE_ID: 1
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:19091,2@kafka2:19092,3@kafka3:19093'
+  #     KAFKA_JMX_PORT: 9991
+  #     KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9991
+  #     CLUSTER_ID: '6E7qhxHvTBeyvLukiEiMaA'
+  #   volumes:
+  #     - ./kafka-data/1/logs:/tmp/kafka-logs
+  #     - ./kafka-data/1/data:/var/lib/kafka/data
+  #     - ./kafka-data/1/secrets:/etc/kafka/secrets
+  #   networks:
+  #     - boiler-plate-network
+
+  # kafka2:
+  #   image: confluentinc/cp-kafka:7.5.0
+  #   restart: always
+  #   ports:
+  #     - 9092:9092
+  #   environment:
+  #     KAFKA_LISTENERS: BROKER://kafka2:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://kafka2:19092
+  #     KAFKA_ADVERTISED_LISTENERS: BROKER://kafka2:29092,EXTERNAL://localhost:9092
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  #     KAFKA_PROCESS_ROLES: 'controller,broker'
+  #     KAFKA_NODE_ID: 2
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:19091,2@kafka2:19092,3@kafka3:19093'
+  #     KAFKA_JMX_PORT: 9992
+  #     KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9992
+  #     CLUSTER_ID: '6E7qhxHvTBeyvLukiEiMaA'
+  #   volumes:
+  #     - ./kafka-data/2/logs:/tmp/kafka-logs
+  #     - ./kafka-data/2/data:/var/lib/kafka/data
+  #     - ./kafka-data/2/secrets:/etc/kafka/secrets
+  #   networks:
+  #     - boiler-plate-network
+
+  # kafka3:
+  #   image: confluentinc/cp-kafka:7.5.0
+  #   restart: always
+  #   ports:
+  #     - 9093:9093
+  #   environment:
+  #     KAFKA_LISTENERS: BROKER://kafka3:29093,EXTERNAL://0.0.0.0:9093,CONTROLLER://kafka3:19093
+  #     KAFKA_ADVERTISED_LISTENERS: BROKER://kafka3:29093,EXTERNAL://localhost:9093
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  #     KAFKA_PROCESS_ROLES: 'controller,broker'
+  #     KAFKA_NODE_ID: 3
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:19091,2@kafka2:19092,3@kafka3:19093'
+  #     KAFKA_JMX_PORT: 9993
+  #     KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9993
+  #     CLUSTER_ID: '6E7qhxHvTBeyvLukiEiMaA'
+  #   volumes:
+  #     - ./kafka-data/3/logs:/tmp/kafka-logs
+  #     - ./kafka-data/3/data:/var/lib/kafka/data
+  #     - ./kafka-data/3/secrets:/etc/kafka/secrets
+  #   networks:
+  #     - boiler-plate-network
+
+  # kafka-ui:
+  #   image: 'provectuslabs/kafka-ui:latest'
+  #   restart: always
+  #   depends_on:
+  #     - kafka1
+  #     - kafka2
+  #     - kafka3
+  #   ports:
+  #     - 18080:8080
+  #   environment:
+  #     KAFKA_CLUSTERS_0_NAME: kafka1
+  #     KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka1:29091
+  #     KAFKA_CLUSTERS_0_METRICS_PORT: 9991
+  #     KAFKA_CLUSTERS_1_NAME: kafka2
+  #     KAFKA_CLUSTERS_1_BOOTSTRAP_SERVERS: kafka2:29092
+  #     KAFKA_CLUSTERS_1_METRICS_PORT: 9992
+  #     KAFKA_CLUSTERS_2_NAME: kafka3
+  #     KAFKA_CLUSTERS_2_BOOTSTRAP_SERVERS: kafka3:29093
+  #     KAFKA_CLUSTERS_2_METRICS_PORT: 9993
+  #     DYNAMIC_CONFIG_ENABLED: 'true'
+  #     AUTH_TYPE: LOGIN_FORM
+  #     SPRING_SECURITY_USER_NAME: kafka-ui-admin
+  #     SPRING_SECURITY_USER_PASSWORD: Admin321
+  #   networks:
+  #     - boiler-plate-network
