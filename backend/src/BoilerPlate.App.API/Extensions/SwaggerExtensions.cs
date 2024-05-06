@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using BoilerPlate.App.API.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace BoilerPlate.App.API.Extensions;
 
@@ -17,15 +18,16 @@ public static class SwaggerExtensions
         {
             options.SupportNonNullableReferenceTypes();
             options.SchemaFilter<SwaggerRequiredSchemaFilter>();
+            options.AddTypesToSwaggerSchema();
 
             options.AddSecurityDefinition(
                 JwtBearerDefaults.AuthenticationScheme,
                 new OpenApiSecurityScheme
                 {
-                    Description = "Example: Bearer {token}",
+                    Description = "Jwt token",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
+                    Type = SecuritySchemeType.Http,
                     Scheme = JwtBearerDefaults.AuthenticationScheme
                 });
 
@@ -69,5 +71,16 @@ public static class SwaggerExtensions
             o.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
             o.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
         });
+    }
+
+    private static void AddTypesToSwaggerSchema(this SwaggerGenOptions options)
+    {
+        // options.DocumentFilter<CustomModelDocumentFilter<SomeTypeDto>>();
+    }
+
+    private class CustomModelDocumentFilter<T> : IDocumentFilter where T : class
+    {
+        public void Apply(OpenApiDocument openapiDoc, DocumentFilterContext context) =>
+            context.SchemaGenerator.GenerateSchema(typeof(T), context.SchemaRepository);
     }
 }
