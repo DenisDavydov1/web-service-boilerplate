@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "API",
-    "version": "v1"
+    "version": "0.0.1"
   },
   "paths": {
     "/api/v1/auth": {
@@ -1056,10 +1056,9 @@
     },
     "securitySchemes": {
       "Bearer": {
-        "type": "apiKey",
-        "description": "Example: Bearer {token}",
-        "name": "Authorization",
-        "in": "header"
+        "type": "http",
+        "description": "Jwt token",
+        "scheme": "Bearer"
       }
     }
   },

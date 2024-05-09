@@ -12,6 +12,8 @@ using BoilerPlate.Data.DAL.Extensions;
 using BoilerPlate.Data.Seeds.Extensions;
 using BoilerPlate.Services.Kafka.Extensions;
 using BoilerPlate.Services.System.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +32,7 @@ builder.Services.AddValidators();
 builder.Services.AddAuthentication(configuration);
 builder.Services.AddUserRoleAuthorization();
 builder.Services.AddControllersWithOptions();
+builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
 builder.Services.SetDateTimeFormat();
 builder.Services.AddSwagger();
@@ -63,6 +66,7 @@ app.UseMiddleware<JwtValidationMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/healthz").WithMetadata(new AllowAnonymousAttribute(), new HttpLoggingAttribute(HttpLoggingFields.None));
 app.UseHttpLogging();
 
 if (EnvUtils.IsSwaggerGen == false)

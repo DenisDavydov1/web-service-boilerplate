@@ -6,55 +6,70 @@ networks:
 
 services:
   nginx:
-    image: boiler-plate/nginx:latest
+    image: boiler-plate/nginx:${BOILER_PLATE_NGINX_TAG}
     build:
       context: .
       args:
         - BOILER_PLATE_ENVIRONMENT=${BOILER_PLATE_ENVIRONMENT}
-    restart: always
     ports:
       - 80:80
       - 443:443
     networks:
       - boiler-plate-network
+    restart: always
+    depends_on:
+      backend:
+        condition: service_healthy
 
   postgres:
-    image: postgres:16.0-alpine3.18
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    image: postgres:${BOILER_PLATE_POSTGRES_TAG}
     ports:
-      - 4321:5432
-    volumes:
-      - ${BOILER_PLATE_APP_DATA_PATH}/postgres:/var/lib/postgresql/data:rw
+      - ${BOILER_PLATE_POSTGRES_PORT}:5432
     networks:
       - boiler-plate-network
+    environment:
+      - POSTGRES_USER=${BOILER_PLATE_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${BOILER_PLATE_POSTGRES_PASSWORD}
+    volumes:
+      - ${BOILER_PLATE_DATA_PATH}/postgres/data:/var/lib/postgresql/data:rw
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${BOILER_PLATE_POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 120
 
   backend:
-    image: boiler-plate/backend:latest
+    image: boiler-plate/backend:${BOILER_PLATE_BACKEND_TAG}
     build:
       context:
         backend
-    restart: always
+    networks:
+      - boiler-plate-network
     environment:
-      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_ENVIRONMENT: ${BOILER_PLATE_ASPNETCORE_ENVIRONMENT}
       ConnectionStrings__Default: ${BOILER_PLATE_POSTGRES_CONNECTION}
       Jwt__PublicKey: ${BOILER_PLATE_JWT_PUBLIC_KEY}
       Jwt__PrivateKey: ${BOILER_PLATE_JWT_PRIVATE_KEY}
     volumes:
       - ./configs/backend/appsettings.Production.json:/app/appsettings.Production.json:ro
-      - ${BOILER_PLATE_APP_DATA_PATH}/file-storage:/app/file-storage:rw
+      - ${BOILER_PLATE_DATA_PATH}/file-storage:/app/file-storage:rw
+    restart: always
     depends_on:
-      - postgres
-    networks:
-      - boiler-plate-network
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -v http://localhost/healthz | grep -q 'Healthy'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 120
 
   kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    restart: always
+    image: confluentinc/cp-kafka:${BOILER_PLATE_CP_KAFKA_TAG}
     ports:
       - 9091:9091
+    networks:
+      - boiler-plate-network
     environment:
       KAFKA_LISTENERS: BROKER://kafka:29091,EXTERNAL://0.0.0.0:9091,CONTROLLER://kafka:19091
       KAFKA_ADVERTISED_LISTENERS: BROKER://kafka:29091,EXTERNAL://localhost:9091
@@ -71,133 +86,93 @@ services:
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9991
       CLUSTER_ID: ${BOILER_PLATE_KAFKA_CLUSTER_ID}
     volumes:
-      - ${BOILER_PLATE_APP_DATA_PATH}/kafka/logs:/tmp/kafka-logs
-      - ${BOILER_PLATE_APP_DATA_PATH}/kafka/data:/var/lib/kafka/data
-      - ${BOILER_PLATE_APP_DATA_PATH}/kafka/secrets:/etc/kafka/secrets
-    networks:
-      - boiler-plate-network
+      - ${BOILER_PLATE_DATA_PATH}/kafka/logs:/tmp/kafka-logs:rw
+      - ${BOILER_PLATE_DATA_PATH}/kafka/data:/var/lib/kafka/data:rw
+      - ${BOILER_PLATE_DATA_PATH}/kafka/secrets:/etc/kafka/secrets:rw
+    restart: always
 
   kafka-ui:
-    image: 'provectuslabs/kafka-ui:latest'
-    restart: always
-    depends_on:
-      - kafka
+    image: provectuslabs/kafka-ui:${BOILER_PLATE_KAFKA_UI_TAG}
     ports:
-      - 18080:8080
+      - ${BOILER_PLATE_KAFKA_UI_PORT}:8080
+    networks:
+      - boiler-plate-network
     environment:
       KAFKA_CLUSTERS_0_NAME: kafka
       KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:29091
       KAFKA_CLUSTERS_0_METRICS_PORT: 9991
       DYNAMIC_CONFIG_ENABLED: 'true'
       AUTH_TYPE: LOGIN_FORM
-      SPRING_SECURITY_USER_NAME: kafka-ui-admin
-      SPRING_SECURITY_USER_PASSWORD: Admin321
+      SPRING_SECURITY_USER_NAME: ${BOILER_PLATE_KAFKA_UI_LOGIN}
+      SPRING_SECURITY_USER_PASSWORD: ${BOILER_PLATE_KAFKA_UI_PASSWORD}
+    restart: always
+    depends_on:
+      - kafka
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${BOILER_PLATE_ELK_TAG}
+    ports:
+      - ${BOILER_PLATE_ELASTIC_PORT}:9200
     networks:
       - boiler-plate-network
+    environment:
+      discovery.type: single-node
+      cluster.name: elasticsearch
+      bootstrap.memory_lock: true
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      ELASTIC_PASSWORD: ${BOILER_PLATE_ELASTIC_PASSWORD}
+      xpack.security.http.ssl.enabled: false
+    volumes:
+      - ${BOILER_PLATE_DATA_PATH}/elk/elasticsearch/data:/usr/share/elasticsearch/data:rw
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:9200 | grep -q 'missing authentication credentials'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 120
 
-  # kafka1:
-  #   image: confluentinc/cp-kafka:7.5.0
-  #   restart: always
-  #   ports:
-  #     - 9091:9091
-  #   environment:
-  #     KAFKA_LISTENERS: BROKER://kafka1:29091,EXTERNAL://0.0.0.0:9091,CONTROLLER://kafka1:19091
-  #     KAFKA_ADVERTISED_LISTENERS: BROKER://kafka1:29091,EXTERNAL://localhost:9091
-  #     KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
-  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
-  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
-  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-  #     KAFKA_PROCESS_ROLES: 'controller,broker'
-  #     KAFKA_NODE_ID: 1
-  #     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:19091,2@kafka2:19092,3@kafka3:19093'
-  #     KAFKA_JMX_PORT: 9991
-  #     KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9991
-  #     CLUSTER_ID: '6E7qhxHvTBeyvLukiEiMaA'
-  #   volumes:
-  #     - ./kafka-data/1/logs:/tmp/kafka-logs
-  #     - ./kafka-data/1/data:/var/lib/kafka/data
-  #     - ./kafka-data/1/secrets:/etc/kafka/secrets
-  #   networks:
-  #     - boiler-plate-network
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${BOILER_PLATE_ELK_TAG}
+    ports:
+      - ${BOILER_PLATE_KIBANA_PORT}:5601
+    networks:
+      - boiler-plate-network
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: ${BOILER_PLATE_KIBANA_PASSWORD}
+      TELEMETRY_ENABLED: false
+    volumes:
+      - ${BOILER_PLATE_DATA_PATH}/elk/kibana/data:/usr/share/kibana/data:rw
+    mem_limit: 1g
+    restart: always
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      elasticsearch-setup:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 120
 
-  # kafka2:
-  #   image: confluentinc/cp-kafka:7.5.0
-  #   restart: always
-  #   ports:
-  #     - 9092:9092
-  #   environment:
-  #     KAFKA_LISTENERS: BROKER://kafka2:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://kafka2:19092
-  #     KAFKA_ADVERTISED_LISTENERS: BROKER://kafka2:29092,EXTERNAL://localhost:9092
-  #     KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
-  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
-  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
-  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-  #     KAFKA_PROCESS_ROLES: 'controller,broker'
-  #     KAFKA_NODE_ID: 2
-  #     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:19091,2@kafka2:19092,3@kafka3:19093'
-  #     KAFKA_JMX_PORT: 9992
-  #     KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9992
-  #     CLUSTER_ID: '6E7qhxHvTBeyvLukiEiMaA'
-  #   volumes:
-  #     - ./kafka-data/2/logs:/tmp/kafka-logs
-  #     - ./kafka-data/2/data:/var/lib/kafka/data
-  #     - ./kafka-data/2/secrets:/etc/kafka/secrets
-  #   networks:
-  #     - boiler-plate-network
-
-  # kafka3:
-  #   image: confluentinc/cp-kafka:7.5.0
-  #   restart: always
-  #   ports:
-  #     - 9093:9093
-  #   environment:
-  #     KAFKA_LISTENERS: BROKER://kafka3:29093,EXTERNAL://0.0.0.0:9093,CONTROLLER://kafka3:19093
-  #     KAFKA_ADVERTISED_LISTENERS: BROKER://kafka3:29093,EXTERNAL://localhost:9093
-  #     KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
-  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
-  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
-  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-  #     KAFKA_PROCESS_ROLES: 'controller,broker'
-  #     KAFKA_NODE_ID: 3
-  #     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:19091,2@kafka2:19092,3@kafka3:19093'
-  #     KAFKA_JMX_PORT: 9993
-  #     KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9993
-  #     CLUSTER_ID: '6E7qhxHvTBeyvLukiEiMaA'
-  #   volumes:
-  #     - ./kafka-data/3/logs:/tmp/kafka-logs
-  #     - ./kafka-data/3/data:/var/lib/kafka/data
-  #     - ./kafka-data/3/secrets:/etc/kafka/secrets
-  #   networks:
-  #     - boiler-plate-network
-
-  # kafka-ui:
-  #   image: 'provectuslabs/kafka-ui:latest'
-  #   restart: always
-  #   depends_on:
-  #     - kafka1
-  #     - kafka2
-  #     - kafka3
-  #   ports:
-  #     - 18080:8080
-  #   environment:
-  #     KAFKA_CLUSTERS_0_NAME: kafka1
-  #     KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka1:29091
-  #     KAFKA_CLUSTERS_0_METRICS_PORT: 9991
-  #     KAFKA_CLUSTERS_1_NAME: kafka2
-  #     KAFKA_CLUSTERS_1_BOOTSTRAP_SERVERS: kafka2:29092
-  #     KAFKA_CLUSTERS_1_METRICS_PORT: 9992
-  #     KAFKA_CLUSTERS_2_NAME: kafka3
-  #     KAFKA_CLUSTERS_2_BOOTSTRAP_SERVERS: kafka3:29093
-  #     KAFKA_CLUSTERS_2_METRICS_PORT: 9993
-  #     DYNAMIC_CONFIG_ENABLED: 'true'
-  #     AUTH_TYPE: LOGIN_FORM
-  #     SPRING_SECURITY_USER_NAME: kafka-ui-admin
-  #     SPRING_SECURITY_USER_PASSWORD: Admin321
-  #   networks:
-  #     - boiler-plate-network
+  elasticsearch-setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${BOILER_PLATE_ELK_TAG}
+    networks:
+      - boiler-plate-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    command:
+      - /bin/bash
+      - -c
+      - |
+        echo "Setting kibana_system password";
+        until curl -s -X POST -u "elastic:${BOILER_PLATE_ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${BOILER_PLATE_KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        echo "All done!";

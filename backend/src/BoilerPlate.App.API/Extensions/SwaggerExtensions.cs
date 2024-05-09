@@ -49,8 +49,8 @@ public static class SwaggerExtensions
                 }
             });
 
-            options.SwaggerDoc("v1", new OpenApiInfo { Version = "v1", Title = "API" });
-            options.SwaggerDoc("v2", new OpenApiInfo { Version = "v2", Title = "API" });
+            options.SwaggerDoc("v1", new OpenApiInfo { Version = "1.0.0", Title = "API" });
+            options.SwaggerDoc("v2", new OpenApiInfo { Version = "1.0.0", Title = "API" });
 
             options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
