@@ -4,7 +4,6 @@ using BoilerPlate.Data.DTO.System.Authentication.Requests;
 using BoilerPlate.Data.DTO.System.Authentication.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoilerPlate.App.API.Controllers.V1;
@@ -15,7 +14,6 @@ namespace BoilerPlate.App.API.Controllers.V1;
 [ApiVersion(1)]
 [ApiExplorerSettings(GroupName = "v1")]
 [Route("api/v{version:apiVersion}/auth")]
-[HttpLogging(HttpLoggingFields.All & ~HttpLoggingFields.RequestBody & ~HttpLoggingFields.ResponseBody)]
 public class AuthenticationController : BaseApiController
 {
     /// <inheritdoc />

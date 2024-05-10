@@ -7,8 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using BoilerPlate.Core.Exceptions.Exceptions;
 using BoilerPlate.Core.Serialization;
-using Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace BoilerPlate.App.API.Middlewares;
 
@@ -17,10 +15,10 @@ namespace BoilerPlate.App.API.Middlewares;
 /// </summary>
 public class ExceptionHandlingMiddleware : IMiddleware
 {
-    private static readonly ILogger Logger = new LoggerConfiguration()
-        .WriteTo.Console()
-        .MinimumLevel.Debug()
-        .CreateLogger();
+    private readonly ILogger _logger;
+
+    /// <summary> Constructor </summary>
+    public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger) => _logger = logger;
 
     /// <inheritdoc />
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -35,12 +33,13 @@ public class ExceptionHandlingMiddleware : IMiddleware
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var details = new HttpValidationProblemDetails();
 
-        Logger.Error(exception, "{ExceptionName} occured at the endpoint {EndpointRoute}",
-            exception.GetType().Name, GetEndpointRoute(context));
+        _logger.LogError(exception,
+            "{ExceptionName} occured at {EndpointRoute}",
+            exception.GetType().Name, context.Request.Path.ToString());
 
         switch (exception)
         {
@@ -195,21 +194,5 @@ public class ExceptionHandlingMiddleware : IMiddleware
         context.Response.StatusCode = details.Status.Value;
 
         await context.Response.WriteAsync(JsonConvert.SerializeObject(details, SerializationSettings.Default));
-    }
-
-    private static string GetEndpointRoute(HttpContext context)
-    {
-        var endpoint = context.GetEndpoint();
-
-        if (endpoint == null)
-        {
-            return context.Request.Path.ToString();
-        }
-
-        var routePattern = (endpoint as RouteEndpoint)?.RoutePattern.RawText;
-
-        return string.IsNullOrWhiteSpace(routePattern)
-            ? context.Request.Path.ToString()
-            : routePattern;
     }
 }

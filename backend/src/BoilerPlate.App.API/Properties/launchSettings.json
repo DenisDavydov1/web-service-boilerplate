@@ -2,14 +2,14 @@
   "profiles": {
     "Local": {
       "commandName": "Project",
-      "applicationUrl": "https://localhost:13096;http://localhost:13095",
+      "applicationUrl": "http://localhost:13095",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Local"
       }
     },
     "Development": {
       "commandName": "Project",
-      "applicationUrl": "https://localhost:13096;http://localhost:13095",
+      "applicationUrl": "http://localhost:13095",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
