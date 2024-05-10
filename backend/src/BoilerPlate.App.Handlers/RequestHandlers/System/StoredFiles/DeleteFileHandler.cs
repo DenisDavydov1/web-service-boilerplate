@@ -12,26 +12,19 @@ using BoilerPlate.Data.DTO.Common.Responses;
 
 namespace BoilerPlate.App.Handlers.RequestHandlers.System.StoredFiles;
 
-public class DeleteFileHandler : IRequestHandler<DeleteByIdRequest<StoredFile>, IdDto>
+public class DeleteFileHandler(
+    IUnitOfWork unitOfWork,
+    IExceptionFactory exceptionFactory,
+    IMapper mapper,
+    IOptions<FileStorageOptions> fileStorageOptions)
+    : IRequestHandler<DeleteByIdRequest<StoredFile>, IdDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IExceptionFactory _exceptionFactory;
-    private readonly FileStorageOptions _fileStorageOptions;
-    private readonly IMapper _mapper;
-
-    public DeleteFileHandler(IUnitOfWork unitOfWork, IExceptionFactory exceptionFactory, IMapper mapper,
-        IOptions<FileStorageOptions> fileStorageOptions)
-    {
-        _unitOfWork = unitOfWork;
-        _exceptionFactory = exceptionFactory;
-        _mapper = mapper;
-        _fileStorageOptions = fileStorageOptions.Value;
-    }
+    private readonly FileStorageOptions _fileStorageOptions = fileStorageOptions.Value;
 
     public async Task<IdDto> Handle(DeleteByIdRequest<StoredFile> request, CancellationToken ct)
     {
-        var storedFile = await _unitOfWork.Repository<StoredFile>().GetByIdAsync(request.Id, ct);
-        _exceptionFactory.ThrowIf<EntityNotFoundException>(
+        var storedFile = await unitOfWork.Repository<StoredFile>().GetByIdAsync(request.Id, ct);
+        exceptionFactory.ThrowIf<EntityNotFoundException>(
             storedFile == null,
             ExceptionCode.System_StoredFiles_DeleteFile_StoredFileNotFound,
             args: [nameof(request.Id)]);
@@ -45,16 +38,16 @@ public class DeleteFileHandler : IRequestHandler<DeleteByIdRequest<StoredFile>, 
             File.Delete(filePath);
         }
 
-        await _unitOfWork.WithTransactionAsync(() =>
+        await unitOfWork.WithTransactionAsync(() =>
         {
-            _unitOfWork.Repository<StoredFile>().Remove(storedFile!);
+            unitOfWork.Repository<StoredFile>().Remove(storedFile!);
         }, ct);
 
-        _exceptionFactory.ThrowIf<EntityNotFoundException>(
+        exceptionFactory.ThrowIf<EntityNotFoundException>(
             isFileExist == false,
             ExceptionCode.System_StoredFiles_DeleteFile_FileNotFound,
             args: [nameof(request.Id)]);
 
-        return _mapper.Map<IdDto>(storedFile);
+        return mapper.Map<IdDto>(storedFile);
     }
 }

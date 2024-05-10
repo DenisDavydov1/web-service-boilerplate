@@ -447,6 +447,37 @@
         }
       }
     },
+    "/api/v1/tests/telegram-send-message": {
+      "post": {
+        "tags": [
+          "Tests"
+        ],
+        "summary": "Telegram bot send test message",
+        "parameters": [
+          {
+            "name": "chatId",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "message",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v1/users/{id}": {
       "get": {
         "tags": [

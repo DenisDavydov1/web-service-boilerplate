@@ -7,37 +7,34 @@ using BoilerPlate.Data.DAL.UnitOfWork;
 using BoilerPlate.Data.Domain.Entities.System;
 using BoilerPlate.Data.DTO.Common.Responses;
 using BoilerPlate.Data.DTO.System.StoredFiles.Requests;
+using BoilerPlate.Services.System.Users;
 
 namespace BoilerPlate.App.Handlers.RequestHandlers.System.StoredFiles;
 
-public class UpdateStoredFileHandler : IRequestHandler<UpdateStoredFileDto, IdDto>
+public class UpdateStoredFileHandler(
+    IUnitOfWork unitOfWork,
+    IExceptionFactory exceptionFactory,
+    IMapper mapper,
+    IUsersService usersService)
+    : IRequestHandler<UpdateStoredFileDto, IdDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IExceptionFactory _exceptionFactory;
-    private readonly IMapper _mapper;
-
-    public UpdateStoredFileHandler(IUnitOfWork unitOfWork, IExceptionFactory exceptionFactory, IMapper mapper)
-    {
-        _unitOfWork = unitOfWork;
-        _exceptionFactory = exceptionFactory;
-        _mapper = mapper;
-    }
-
     public async Task<IdDto> Handle(UpdateStoredFileDto request, CancellationToken ct)
     {
-        var storedFile = await _unitOfWork.Repository<StoredFile>().GetByIdAsync(request.Id, ct);
-        _exceptionFactory.ThrowIf<EntityNotFoundException>(
+        var storedFile = await unitOfWork.Repository<StoredFile>().GetByIdAsync(request.Id, ct);
+        exceptionFactory.ThrowIf<EntityNotFoundException>(
             storedFile == null,
             ExceptionCode.System_StoredFiles_UpdateStoredFile_StoredFileNotFound,
             args: [nameof(request.Id)]);
 
-        _mapper.Map(request, storedFile);
+        mapper.Map(request, storedFile);
+        storedFile!.UpdatedBy = usersService.GetCurrentUserId();
+        storedFile.UpdatedAt = DateTime.UtcNow;
 
-        await _unitOfWork.WithTransactionAsync(() =>
+        await unitOfWork.WithTransactionAsync(() =>
         {
-            _unitOfWork.Repository<StoredFile>().Update(storedFile!);
+            unitOfWork.Repository<StoredFile>().Update(storedFile!);
         }, ct);
 
-        return _mapper.Map<IdDto>(storedFile);
+        return mapper.Map<IdDto>(storedFile);
     }
 }

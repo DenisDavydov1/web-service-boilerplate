@@ -5,12 +5,8 @@ using Xunit.Abstractions;
 
 namespace BoilerPlate.Tests.Services.Common;
 
-public class BaseCommonServicesTests : BaseTests
+public class BaseCommonServicesTests(ITestOutputHelper testOutputHelper) : BaseTests(testOutputHelper)
 {
-    public BaseCommonServicesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-    {
-    }
-
     protected override void AddServices(IServiceCollection services)
     {
         base.AddServices(services);

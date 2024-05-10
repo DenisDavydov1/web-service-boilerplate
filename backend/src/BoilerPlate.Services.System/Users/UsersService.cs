@@ -7,29 +7,21 @@ using BoilerPlate.Data.Domain.Entities.System;
 
 namespace BoilerPlate.Services.System.Users;
 
-internal class UsersService : IUsersService
+internal class UsersService(IHttpContextAccessor httpContextAccessor, IUnitOfWork unitOfWork)
+    : IUsersService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UsersService(IHttpContextAccessor httpContextAccessor, IUnitOfWork unitOfWork)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _unitOfWork = unitOfWork;
-    }
-
     public Guid GetCurrentUserId() =>
-        _httpContextAccessor.HttpContext?.User.Claims.GetNameIdentifier()
+        httpContextAccessor.HttpContext?.User.Claims.GetNameIdentifier()
         ?? throw new AuthenticationException();
 
     public UserRole GetCurrentUserRole() =>
-        _httpContextAccessor.HttpContext?.User.Claims.GetRole()
+        httpContextAccessor.HttpContext?.User.Claims.GetRole()
         ?? throw new AuthenticationException();
 
     public async Task<User> GetCurrentUser(CancellationToken ct = default)
     {
         var id = GetCurrentUserId();
-        var user = await _unitOfWork.Repository<User>().GetByIdAsync(id, ct);
+        var user = await unitOfWork.Repository<User>().GetByIdAsync(id, ct);
         return user ?? throw new AuthenticationException();
     }
 }

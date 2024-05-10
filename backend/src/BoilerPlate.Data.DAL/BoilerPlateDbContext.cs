@@ -4,13 +4,9 @@ using BoilerPlate.Data.Domain.Entities.System;
 
 namespace BoilerPlate.Data.DAL;
 
-public class BoilerPlateDbContext : DbContext
+public class BoilerPlateDbContext(DbContextOptions<BoilerPlateDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; } = null!;
-
-    public BoilerPlateDbContext(DbContextOptions<BoilerPlateDbContext> options) : base(options)
-    {
-    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

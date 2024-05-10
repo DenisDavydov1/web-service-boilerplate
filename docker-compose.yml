@@ -54,6 +54,7 @@ services:
       Jwt__PublicKey: ${BOILER_PLATE_JWT_PUBLIC_KEY}
       Jwt__PrivateKey: ${BOILER_PLATE_JWT_PRIVATE_KEY}
       Serilog__WriteTo__1__Args__nodeUris: "http://elastic:${BOILER_PLATE_ELASTIC_PASSWORD}@elasticsearch:9200"
+      Telegram__BotToken: ${BOILER_PLATE_TELEGRAM_BOT_TOKEN}
     volumes:
       - ./configs/backend/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ${BOILER_PLATE_DATA_PATH}/file-storage:/app/file-storage:rw
@@ -72,7 +73,7 @@ services:
   kafka:
     image: confluentinc/cp-kafka:${BOILER_PLATE_CP_KAFKA_TAG}
     ports:
-      - 9091:9091
+      - ${BOILER_PLATE_KAFKA_PORT}:9091
     networks:
       - boiler-plate-network
     environment:

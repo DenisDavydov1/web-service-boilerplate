@@ -1,5 +1,3 @@
-using System.Security.Claims;
-using BoilerPlate.Core.Constants;
 using BoilerPlate.Core.Extensions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -7,14 +5,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace BoilerPlate.App.Validators;
 
-public abstract class BaseValidator<TRequest> : AbstractValidator<TRequest>
+public abstract class BaseValidator<TRequest>(IHttpContextAccessor httpContextAccessor)
+    : AbstractValidator<TRequest>
     where TRequest : class
 {
-    private readonly string _languageCode;
-
-    protected BaseValidator(IHttpContextAccessor httpContextAccessor) =>
-        _languageCode = httpContextAccessor.HttpContext?.User.FindFirstValue(LanguageCodes.ClaimLanguageCode)
-                        ?? LanguageCodes.English;
+    private readonly string _languageCode = httpContextAccessor.GetUserLanguageCode();
 
     public override ValidationResult Validate(ValidationContext<TRequest> context)
     {

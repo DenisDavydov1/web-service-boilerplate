@@ -13,32 +13,24 @@ using BoilerPlate.Services.System.Users;
 
 namespace BoilerPlate.App.Handlers.RequestHandlers.System.StoredFiles;
 
-public class UploadFileHandler : IRequestHandler<UploadFileRequest, IdDto>
+public class UploadFileHandler(
+    IUnitOfWork unitOfWork,
+    IExceptionFactory exceptionFactory,
+    IOptions<FileStorageOptions> fileStorageOptions,
+    IMapper mapper,
+    IUsersService usersService)
+    : IRequestHandler<UploadFileRequest, IdDto>
 {
     private const int MaxPathLength = 259;
 
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IExceptionFactory _exceptionFactory;
-    private readonly FileStorageOptions _fileStorageOptions;
-    private readonly IMapper _mapper;
-    private readonly IUsersService _usersService;
-
-    public UploadFileHandler(IUnitOfWork unitOfWork, IExceptionFactory exceptionFactory,
-        IOptions<FileStorageOptions> fileStorageOptions, IMapper mapper, IUsersService usersService)
-    {
-        _unitOfWork = unitOfWork;
-        _exceptionFactory = exceptionFactory;
-        _fileStorageOptions = fileStorageOptions.Value;
-        _mapper = mapper;
-        _usersService = usersService;
-    }
+    private readonly FileStorageOptions _fileStorageOptions = fileStorageOptions.Value;
 
     public async Task<IdDto> Handle(UploadFileRequest request, CancellationToken ct)
     {
         var storedFileId = Guid.NewGuid();
         var fileName = storedFileId + Path.GetExtension(request.File.FileName);
         var filePath = Path.Combine(_fileStorageOptions.RootDirectory, fileName);
-        _exceptionFactory.ThrowIf<BusinessException>(
+        exceptionFactory.ThrowIf<BusinessException>(
             filePath.Length > MaxPathLength,
             ExceptionCode.System_StoredFiles_UploadFile_MaxPathLengthExceeded,
             args: [nameof(request.File)]);
@@ -50,14 +42,14 @@ public class UploadFileHandler : IRequestHandler<UploadFileRequest, IdDto>
         {
             Id = storedFileId,
             Name = request.File.FileName,
-            CreatedBy = _usersService.GetCurrentUserId()
+            CreatedBy = usersService.GetCurrentUserId()
         };
 
-        await _unitOfWork.WithTransactionAsync(async () =>
+        await unitOfWork.WithTransactionAsync(async () =>
         {
-            await _unitOfWork.Repository<StoredFile>().AddAsync(storedFile, ct);
+            await unitOfWork.Repository<StoredFile>().AddAsync(storedFile, ct);
         }, ct);
 
-        return _mapper.Map<IdDto>(storedFile);
+        return mapper.Map<IdDto>(storedFile);
     }
 }

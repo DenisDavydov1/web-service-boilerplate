@@ -12,13 +12,9 @@ using Xunit.Abstractions;
 
 namespace BoilerPlate.Tests.Integration.System.Users;
 
-public class UsersPostTests : BaseIntegrationTests
+public class UsersPostTests(TestWebApplicationFactory<Program> factory, ITestOutputHelper testOutputHelper)
+    : BaseIntegrationTests(factory, testOutputHelper)
 {
-    public UsersPostTests(TestWebApplicationFactory<Program> factory, ITestOutputHelper testOutputHelper)
-        : base(factory, testOutputHelper)
-    {
-    }
-
     [Fact]
     public async Task CreateUserAsync_AnonymousRegister_ShouldCreateUserRole()
     {

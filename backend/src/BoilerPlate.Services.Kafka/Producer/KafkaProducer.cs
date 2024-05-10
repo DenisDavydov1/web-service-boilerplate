@@ -11,20 +11,15 @@ using BoilerPlate.Services.Kafka.Utils;
 
 namespace BoilerPlate.Services.Kafka.Producer;
 
-internal class KafkaProducer : IKafkaProducer
+internal class KafkaProducer(IOptions<KafkaOptions> kafkaOptions, IHostEnvironment environment)
+    : IKafkaProducer
 {
-    private readonly ProducerConfig _producerConfig;
-    private readonly IHostEnvironment _environment;
+    private readonly ProducerConfig _producerConfig = kafkaOptions.Value.ToProducerConfig();
 
-    public KafkaProducer(IOptions<KafkaOptions> kafkaOptions, IHostEnvironment environment)
+    public async Task ProduceAsync(string baseTopic, int? partition, KafkaMessageType type, object? payload,
+        CancellationToken ct = default)
     {
-        _producerConfig = kafkaOptions.Value.ToProducerConfig();
-        _environment = environment;
-    }
-
-    public async Task ProduceAsync(string baseTopic, int? partition, KafkaMessageType type, object? payload, CancellationToken ct = default)
-    {
-        var topic = KafkaNameResolver.GetTopic(baseTopic, _environment);
+        var topic = KafkaNameResolver.GetTopic(baseTopic, environment);
 
         var message = new Message<Null, object?>
         {

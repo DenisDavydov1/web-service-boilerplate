@@ -10,9 +10,7 @@ namespace BoilerPlate.Core.Exceptions.Factory;
 
 internal class ExceptionFactory(IHttpContextAccessor httpContextAccessor) : IExceptionFactory
 {
-    private readonly string _languageCode =
-        httpContextAccessor.HttpContext?.User.FindFirstValue(LanguageCodes.ClaimLanguageCode)
-        ?? LanguageCodes.English;
+    private readonly string _languageCode = httpContextAccessor.GetUserLanguageCode();
 
     public void ThrowIf<TException>(bool condition, ExceptionCode exceptionCode,
         object?[]? args = null, object?[]? formatArgs = null)

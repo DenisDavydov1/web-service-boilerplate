@@ -9,7 +9,7 @@ namespace BoilerPlate.Tests.Base;
 
 public abstract class BaseDbTests : BaseTests, IDisposable
 {
-    protected IUnitOfWork UnitOfWork;
+    protected readonly IUnitOfWork UnitOfWork;
 
     public BaseDbTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) =>
         UnitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();

@@ -5,6 +5,7 @@ using BoilerPlate.Core.Utils;
 using BoilerPlate.Data.Abstractions.Enums;
 using BoilerPlate.Data.DTO.Common.Responses;
 using BoilerPlate.Data.DTO.System.Tests.Requests;
+using BoilerPlate.Services.Telegram.BotTestService;
 using Coravel.Invocable;
 using Coravel.Queuing.Interfaces;
 using MediatR;
@@ -22,19 +23,21 @@ public class TestsController : BaseApiController
 {
     private readonly IQueue _queue;
     private readonly IMediator _mediator;
+    private readonly ITelegramBotTestService _telegramBotTestService;
 
     /// <inheritdoc />
     public TestsController(IMediator mediator, ILogger<TestsController> logger, IExceptionFactory exceptionFactory,
-        IQueue queue) : base(mediator, logger, exceptionFactory)
+        IQueue queue, ITelegramBotTestService telegramBotTestService) : base(mediator, logger, exceptionFactory)
     {
         _mediator = mediator;
         _queue = queue;
+        _telegramBotTestService = telegramBotTestService;
     }
 
     /// <summary> Log out user </summary>
     [HttpPost("enqueue-job")]
     [MinimumRoleAuthorize(UserRole.Admin)]
-    public ActionResult<IdDto> EnqueueJobAsync([FromBody] EnqueueJobDto request)
+    public ActionResult<IdDto> EnqueueJob([FromBody] EnqueueJobDto request)
     {
         var jobType = AssemblyUtils.GetType(request.JobName);
         if (jobType == null)
@@ -77,10 +80,19 @@ public class TestsController : BaseApiController
     /// <summary> Publish test Kafka message </summary>
     [HttpPost("kafka-produce")]
     [MinimumRoleAuthorize(UserRole.Admin)]
-    public async Task<ActionResult> KafkaProduceMessageAsync([FromBody] KafkaProduceMessageDto request,
+    public async Task<ActionResult> KafkaProduceMessage([FromBody] KafkaProduceMessageDto request,
         CancellationToken ct)
     {
         await _mediator.Send(request, ct);
+        return Ok();
+    }
+
+    /// <summary> Telegram bot send test message </summary>
+    [HttpPost("telegram-send-message")]
+    [MinimumRoleAuthorize(UserRole.Admin)]
+    public async Task<ActionResult> TelegramSendMessage(string chatId, string message, CancellationToken ct)
+    {
+        await _telegramBotTestService.SendMessage(chatId, message, ct);
         return Ok();
     }
 }

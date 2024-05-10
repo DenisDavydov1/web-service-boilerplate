@@ -9,13 +9,9 @@ using Xunit.Abstractions;
 
 namespace BoilerPlate.Tests.Integration.System.Authentication;
 
-public class AuthenticationPostTests : BaseIntegrationTests
+public class AuthenticationPostTests(TestWebApplicationFactory<Program> factory, ITestOutputHelper testOutputHelper)
+    : BaseIntegrationTests(factory, testOutputHelper)
 {
-    public AuthenticationPostTests(TestWebApplicationFactory<Program> factory, ITestOutputHelper testOutputHelper)
-        : base(factory, testOutputHelper)
-    {
-    }
-
     [Fact]
     public async Task GetAccessTokenAsync_AdminRole_ShouldSuccess()
     {

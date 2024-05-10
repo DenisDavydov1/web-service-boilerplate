@@ -6,16 +6,10 @@ using BoilerPlate.Services.Kafka.Options;
 
 namespace BoilerPlate.Services.Kafka.AdminClient;
 
-internal class KafkaAdminClient : IKafkaAdminClient
+internal class KafkaAdminClient(ILogger<KafkaAdminClient> logger, IOptions<KafkaOptions> kafkaOptions)
+    : IKafkaAdminClient
 {
-    private readonly ILogger<KafkaAdminClient> _logger;
-    private readonly KafkaOptions _kafkaOptions;
-
-    public KafkaAdminClient(ILogger<KafkaAdminClient> logger, IOptions<KafkaOptions> kafkaOptions)
-    {
-        _logger = logger;
-        _kafkaOptions = kafkaOptions.Value;
-    }
+    private readonly KafkaOptions _kafkaOptions = kafkaOptions.Value;
 
     public async Task CreateTopicAsync(string name, int partitions, int retries = 10, CancellationToken ct = default)
     {
@@ -44,7 +38,7 @@ internal class KafkaAdminClient : IKafkaAdminClient
                     }
                 });
 
-                _logger.LogInformation("Topic {Name} created", name);
+                logger.LogInformation("Topic {Name} created", name);
                 return;
             }
             catch (Exception e)
@@ -52,7 +46,7 @@ internal class KafkaAdminClient : IKafkaAdminClient
                 await Task.Delay(5000, ct);
                 ex = e;
                 retries--;
-                _logger.LogWarning("Retrying to create topic {Name}...", name);
+                logger.LogWarning("Retrying to create topic {Name}...", name);
             }
         }
 

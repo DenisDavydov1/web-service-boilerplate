@@ -5,24 +5,20 @@ using BoilerPlate.Data.Domain.Entities.Base;
 
 namespace BoilerPlate.Data.DAL.UnitOfWork;
 
-internal class UnitOfWork : IUnitOfWork
+internal class UnitOfWork(BoilerPlateDbContext dbContext) : IUnitOfWork
 {
     private readonly ConcurrentDictionary<Type, object> _repositoriesCache = new();
 
-    private readonly BoilerPlateDbContext _dbContext;
     private IDbContextTransaction? _transaction;
 
-    public UnitOfWork(BoilerPlateDbContext dbContext) =>
-        _dbContext = dbContext;
-
-    public void Dispose() => _dbContext.Dispose();
+    public void Dispose() => dbContext.Dispose();
 
     public IRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity
     {
         var isInCache = _repositoriesCache.TryGetValue(typeof(TEntity), out var repositoryObject);
         if (isInCache) return (IRepository<TEntity>) repositoryObject!;
 
-        var repository = new Repository<TEntity>(_dbContext);
+        var repository = new Repository<TEntity>(dbContext);
         var isAdded = _repositoriesCache.TryAdd(typeof(TEntity), repository);
         if (!isAdded)
         {
@@ -39,7 +35,7 @@ internal class UnitOfWork : IUnitOfWork
             throw new Exception("Transaction has already started");
         }
 
-        _transaction = await _dbContext.Database.BeginTransactionAsync(ct);
+        _transaction = await dbContext.Database.BeginTransactionAsync(ct);
     }
 
     public async Task CommitAsync(CancellationToken ct = default)
@@ -67,7 +63,7 @@ internal class UnitOfWork : IUnitOfWork
     }
 
     public async Task SaveAsync(CancellationToken ct = default) =>
-        await _dbContext.SaveChangesAsync(ct);
+        await dbContext.SaveChangesAsync(ct);
 
     public async Task WithTransactionAsync(Func<Task> task, CancellationToken ct = default)
     {

@@ -13,24 +13,18 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace BoilerPlate.App.Handlers.RequestHandlers.System.StoredFiles;
 
-public class DownloadFileHandler : IRequestHandler<DownloadFileRequest, DownloadFileResponse>
+public class DownloadFileHandler(
+    IUnitOfWork unitOfWork,
+    IExceptionFactory exceptionFactory,
+    IOptions<FileStorageOptions> fileStorageOptions)
+    : IRequestHandler<DownloadFileRequest, DownloadFileResponse>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IExceptionFactory _exceptionFactory;
-    private readonly FileStorageOptions _fileStorageOptions;
-
-    public DownloadFileHandler(IUnitOfWork unitOfWork, IExceptionFactory exceptionFactory,
-        IOptions<FileStorageOptions> fileStorageOptions)
-    {
-        _unitOfWork = unitOfWork;
-        _exceptionFactory = exceptionFactory;
-        _fileStorageOptions = fileStorageOptions.Value;
-    }
+    private readonly FileStorageOptions _fileStorageOptions = fileStorageOptions.Value;
 
     public async Task<DownloadFileResponse> Handle(DownloadFileRequest request, CancellationToken ct)
     {
-        var storedFile = await _unitOfWork.Repository<StoredFile>().GetByIdAsync(request.Id, ct);
-        _exceptionFactory.ThrowIf<EntityNotFoundException>(
+        var storedFile = await unitOfWork.Repository<StoredFile>().GetByIdAsync(request.Id, ct);
+        exceptionFactory.ThrowIf<EntityNotFoundException>(
             storedFile == null,
             ExceptionCode.System_StoredFiles_DownloadFile_StoredFileNotFound,
             args: [nameof(request.Id)]);
@@ -38,7 +32,7 @@ public class DownloadFileHandler : IRequestHandler<DownloadFileRequest, Download
         var fileName = storedFile!.Id + Path.GetExtension(storedFile.Name);
         var filePath = Path.Combine(_fileStorageOptions.RootDirectory, fileName);
 
-        _exceptionFactory.ThrowIf<EntityNotFoundException>(
+        exceptionFactory.ThrowIf<EntityNotFoundException>(
             File.Exists(filePath) == false,
             ExceptionCode.System_StoredFiles_DownloadFile_FileNotFound,
             args: [nameof(request.Id)]);

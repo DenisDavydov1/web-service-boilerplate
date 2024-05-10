@@ -4,12 +4,10 @@ using BoilerPlate.Data.Domain.Entities.Base;
 
 namespace BoilerPlate.Data.DAL.Repositories;
 
-public class Repository<T> : IRepository<T> where T : BaseEntity
+public class Repository<T>(BoilerPlateDbContext dbContext) : IRepository<T>
+    where T : BaseEntity
 {
-    protected readonly DbSet<T> DbSet;
-
-    public Repository(BoilerPlateDbContext dbContext) =>
-        DbSet = dbContext.Set<T>();
+    protected readonly DbSet<T> DbSet = dbContext.Set<T>();
 
     public async Task AddAsync(T entity, CancellationToken ct = default) =>
         await DbSet.AddAsync(entity, ct);

@@ -13,13 +13,9 @@ using Xunit.Abstractions;
 
 namespace BoilerPlate.Tests.Integration.System.Users;
 
-public class UsersGetTests : BaseIntegrationTests
+public class UsersGetTests(TestWebApplicationFactory<Program> factory, ITestOutputHelper testOutputHelper)
+    : BaseIntegrationTests(factory, testOutputHelper)
 {
-    public UsersGetTests(TestWebApplicationFactory<Program> factory, ITestOutputHelper testOutputHelper)
-        : base(factory, testOutputHelper)
-    {
-    }
-
     protected override void AddServices(IServiceCollection services) => base.AddServices(services);
     protected override void AddHostServices(IServiceCollection services) => base.AddHostServices(services);
 

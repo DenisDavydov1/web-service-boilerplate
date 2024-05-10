@@ -2,6 +2,7 @@ using System.Reflection;
 using BoilerPlate.App.API.Extensions;
 using BoilerPlate.App.API.Middlewares;
 using BoilerPlate.App.Handlers.Extensions;
+using BoilerPlate.App.Handlers.Options;
 using BoilerPlate.App.Jobs.Extensions;
 using BoilerPlate.App.Mappers.Extensions;
 using BoilerPlate.App.Validators.Extensions;
@@ -11,7 +12,10 @@ using BoilerPlate.Core.Utils;
 using BoilerPlate.Data.DAL.Extensions;
 using BoilerPlate.Data.Seeds.Extensions;
 using BoilerPlate.Services.Kafka.Extensions;
+using BoilerPlate.Services.Kafka.Options;
 using BoilerPlate.Services.System.Extensions;
+using BoilerPlate.Services.Telegram.Extensions;
+using BoilerPlate.Services.Telegram.Options;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,13 +44,16 @@ builder.Services.AddSwagger();
 builder.Services.AddExceptions();
 builder.Services.AddJobs();
 
-if (configuration.IsFileStorageEnabled())
+if (configuration.IsServiceEnabled<FileStorageOptions>())
     builder.Services.AddFileStorage(configuration);
 
 builder.Services.AddSystemServices();
 
-if (configuration.IsKafkaEnabled() && EnvUtils.IsSwaggerGen == false)
-    builder.Services.AddKafka(builder.Configuration);
+if (configuration.IsServiceEnabled<KafkaOptions>() && EnvUtils.IsSwaggerGen == false)
+    builder.Services.AddKafka(configuration);
+
+if (configuration.IsServiceEnabled<TelegramOptions>())
+    builder.Services.AddTelegram(configuration);
 
 builder.Services.AddScoped<ExceptionHandlingMiddleware>();
 builder.Services.AddScoped<JwtValidationMiddleware>();

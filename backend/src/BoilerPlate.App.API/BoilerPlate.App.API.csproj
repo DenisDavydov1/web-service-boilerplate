@@ -52,6 +52,7 @@
     <ProjectReference Include="..\BoilerPlate.Data.DAL\BoilerPlate.Data.DAL.csproj" />
     <ProjectReference Include="..\BoilerPlate.Data.Seeds\BoilerPlate.Data.Seeds.csproj" />
     <ProjectReference Include="..\BoilerPlate.Services.System\BoilerPlate.Services.System.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Services.Telegram\BoilerPlate.Services.Telegram.csproj" />
   </ItemGroup>
 
   <Target Name="GenerateTsClient" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">

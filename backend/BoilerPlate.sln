@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.App.Mappers", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.App.Validators", "src\BoilerPlate.App.Validators\BoilerPlate.App.Validators.csproj", "{9952F359-59B2-446B-937D-C660C5372C66}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.Services.Telegram", "src\BoilerPlate.Services.Telegram\BoilerPlate.Services.Telegram.csproj", "{5361293D-5C23-4D2E-913D-3CF53FCBFC8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +163,10 @@ Global
 		{9952F359-59B2-446B-937D-C660C5372C66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9952F359-59B2-446B-937D-C660C5372C66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9952F359-59B2-446B-937D-C660C5372C66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5361293D-5C23-4D2E-913D-3CF53FCBFC8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5361293D-5C23-4D2E-913D-3CF53FCBFC8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5361293D-5C23-4D2E-913D-3CF53FCBFC8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5361293D-5C23-4D2E-913D-3CF53FCBFC8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7A743853-CBAE-4678-AF09-DE985A820C40} = {79BFC0EB-F987-42D1-A3AA-486522E2F4DC}
@@ -191,5 +197,6 @@ Global
 		{2908074B-6B58-4010-AEA2-ACB17FF16E80} = {60FCC6F2-0D28-48D0-AD47-0F68249E8380}
 		{91110BD9-5040-44C8-912A-88FA7F74B204} = {BD92142E-C92F-43B7-A2CF-6049962F1632}
 		{9952F359-59B2-446B-937D-C660C5372C66} = {BD92142E-C92F-43B7-A2CF-6049962F1632}
+		{5361293D-5C23-4D2E-913D-3CF53FCBFC8B} = {75808891-2011-4419-8C80-3E138AF740B6}
 	EndGlobalSection
 EndGlobal

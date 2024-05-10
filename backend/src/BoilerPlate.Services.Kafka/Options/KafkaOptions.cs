@@ -1,3 +1,4 @@
+using BoilerPlate.Core.Options;
 using Confluent.Kafka;
 
 namespace BoilerPlate.Services.Kafka.Options;
@@ -5,11 +6,11 @@ namespace BoilerPlate.Services.Kafka.Options;
 /// <summary>
 /// Kafka settings
 /// </summary>
-public class KafkaOptions
+public class KafkaOptions : IServiceOptions
 {
-    public const string SectionName = "Kafka";
+    public static string SectionName => "Kafka";
 
-    public bool Enabled { get; set; }
+    public bool Enabled { get; set; } = true;
 
     /// <summary> Connections to Kafka (usually with port 9092) </summary>
     public string Servers { get; set; } = null!;

@@ -3,27 +3,19 @@ using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using BoilerPlate.App.Handlers.Options;
+using BoilerPlate.Core.Extensions;
 using BoilerPlate.Core.Utils;
 
 namespace BoilerPlate.App.API.Extensions;
 
-/// <summary>
-/// File storage settings
-/// </summary>
+/// <summary> File storage settings </summary>
 public static class FileStorageExtensions
 {
-    /// <summary> Run with file storage </summary>
-    public static bool IsFileStorageEnabled(this IConfiguration configuration) =>
-        configuration.GetSection(FileStorageOptions.SectionName).Exists();
-
     /// <summary> Add file storage </summary>
     public static void AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
-        var optionsSection = configuration.GetSection(FileStorageOptions.SectionName);
-        services.Configure<FileStorageOptions>(optionsSection);
-        var options = optionsSection.Get<FileStorageOptions>();
-
-        if (options?.RootDirectory == null!)
+        var options = services.AddServiceOptions<FileStorageOptions>(configuration);
+        if (options.RootDirectory == null!)
         {
             throw new Exception("File storage root directory configuration is missing");
         }

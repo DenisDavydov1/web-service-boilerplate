@@ -1,8 +1,12 @@
+using BoilerPlate.Core.Options;
+
 namespace BoilerPlate.App.Handlers.Options;
 
-public class JwtOptions
+public class JwtOptions : IServiceOptions
 {
-    public const string SectionName = "Jwt";
+    public static string SectionName => "Jwt";
+
+    public bool Enabled => true;
 
     public string Issuer { get; set; } = null!;
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BoilerPlate.App.API.Constants;
 using BoilerPlate.App.Handlers.Options;
 using BoilerPlate.App.Handlers.Utils;
+using BoilerPlate.Core.Extensions;
 using BoilerPlate.Data.Abstractions.Enums;
 
 namespace BoilerPlate.App.API.Extensions;
@@ -16,13 +17,7 @@ public static class AuthExtensions
     /// <summary> Authenticate users with jwt tokens </summary>
     public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        var optionsSection = configuration.GetSection(JwtOptions.SectionName);
-        services.Configure<JwtOptions>(optionsSection);
-        var options = optionsSection.Get<JwtOptions>();
-        if (options == null)
-        {
-            throw new Exception("JWT options are missing");
-        }
+        var options = services.AddServiceOptions<JwtOptions>(configuration);
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

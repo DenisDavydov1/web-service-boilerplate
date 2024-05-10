@@ -15,31 +15,22 @@ using BoilerPlate.Data.Seeds.Constants;
 
 namespace BoilerPlate.App.Handlers.RequestHandlers.System.Users;
 
-public class RegisterUserHandler : IRequestHandler<RegisterUserDto, IdDto>
+public class RegisterUserHandler(
+    IMapper mapper,
+    IMediator mediator,
+    IUnitOfWork unitOfWork,
+    IExceptionFactory exceptionFactory)
+    : IRequestHandler<RegisterUserDto, IdDto>
 {
-    private readonly IMapper _mapper;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMediator _mediator;
-    private readonly IExceptionFactory _exceptionFactory;
-
-    public RegisterUserHandler(IMapper mapper, IMediator mediator, IUnitOfWork unitOfWork,
-        IExceptionFactory exceptionFactory)
-    {
-        _mapper = mapper;
-        _mediator = mediator;
-        _unitOfWork = unitOfWork;
-        _exceptionFactory = exceptionFactory;
-    }
-
     public async Task<IdDto> Handle(RegisterUserDto request, CancellationToken ct)
     {
-        var isUserExist = await _unitOfWork.Repository<User>().ExistsAsync(x => x.Login == request.Login, ct);
-        _exceptionFactory.ThrowIf<BusinessException>(
+        var isUserExist = await unitOfWork.Repository<User>().ExistsAsync(x => x.Login == request.Login, ct);
+        exceptionFactory.ThrowIf<BusinessException>(
             isUserExist,
             ExceptionCode.System_Users_RegisterUser_LoginTaken,
             args: [nameof(request.Login)]);
 
-        var user = _mapper.Map<User>(request);
+        var user = mapper.Map<User>(request);
         user.Role = UserRole.User;
         user.PasswordHash = HashingUtils.HashBCrypt(request.Password);
         user.SecurityQuestions = request.SecurityQuestions
@@ -51,14 +42,14 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserDto, IdDto>
             .ToArray();
         user.CreatedBy = SeedConstants.RootUserId;
 
-        await _unitOfWork.WithTransactionAsync(async () =>
+        await unitOfWork.WithTransactionAsync(async () =>
         {
-            await _unitOfWork.Repository<User>().AddAsync(user, ct);
+            await unitOfWork.Repository<User>().AddAsync(user, ct);
         }, ct);
 
         var notification = new UserCreatedNotification { User = user };
-        await _mediator.Publish(notification, ct);
+        await mediator.Publish(notification, ct);
 
-        return _mapper.Map<IdDto>(user);
+        return mapper.Map<IdDto>(user);
     }
 }

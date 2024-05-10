@@ -14,30 +14,24 @@ using BoilerPlate.Data.DTO.System.Authentication.Responses;
 
 namespace BoilerPlate.App.Handlers.RequestHandlers.System.Authentication;
 
-public class GetAccessTokenHandler : IRequestHandler<GetAccessTokenDto, JwtTokensDto>
+public class GetAccessTokenHandler(
+    IUnitOfWork unitOfWork,
+    IExceptionFactory exceptionFactory,
+    IOptions<JwtOptions> jwtOptions)
+    : IRequestHandler<GetAccessTokenDto, JwtTokensDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IExceptionFactory _exceptionFactory;
-    private readonly JwtOptions _jwtOptions;
-
-    public GetAccessTokenHandler(IUnitOfWork unitOfWork, IExceptionFactory exceptionFactory,
-        IOptions<JwtOptions> jwtOptions)
-    {
-        _unitOfWork = unitOfWork;
-        _exceptionFactory = exceptionFactory;
-        _jwtOptions = jwtOptions.Value;
-    }
+    private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
     public async Task<JwtTokensDto> Handle(GetAccessTokenDto request, CancellationToken ct)
     {
-        var user = await _unitOfWork.Repository<User>().GetAsync(x => x.Login == request.Login, ct);
-        _exceptionFactory.ThrowIf<EntityNotFoundException>(
+        var user = await unitOfWork.Repository<User>().GetAsync(x => x.Login == request.Login, ct);
+        exceptionFactory.ThrowIf<EntityNotFoundException>(
             user == null || user.IsDeleted,
             ExceptionCode.System_Authentication_GetAccessToken_UserNotFound,
             args: [nameof(request.Login)]);
 
         var isValidPassword = HashingUtils.VerifyBCrypt(request.Password, user!.PasswordHash);
-        _exceptionFactory.ThrowIf<BusinessException>(
+        exceptionFactory.ThrowIf<BusinessException>(
             !isValidPassword,
             ExceptionCode.System_Authentication_GetAccessToken_PasswordInvalid,
             args: [nameof(request.Password)]);
@@ -50,9 +44,9 @@ public class GetAccessTokenHandler : IRequestHandler<GetAccessTokenDto, JwtToken
         user.RefreshTokenId = refreshToken.Claims.GetJti();
         user.RefreshTokenExpiresAt = refreshToken.Claims.GetExp();
 
-        await _unitOfWork.WithTransactionAsync(() =>
+        await unitOfWork.WithTransactionAsync(() =>
         {
-            _unitOfWork.Repository<User>().Update(user);
+            unitOfWork.Repository<User>().Update(user);
         }, ct);
 
         return new JwtTokensDto

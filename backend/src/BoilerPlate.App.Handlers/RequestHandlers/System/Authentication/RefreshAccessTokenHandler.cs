@@ -14,19 +14,13 @@ using BoilerPlate.Data.DTO.System.Authentication.Responses;
 
 namespace BoilerPlate.App.Handlers.RequestHandlers.System.Authentication;
 
-public class RefreshAccessTokenHandler : IRequestHandler<RefreshAccessTokenDto, JwtTokensDto>
+public class RefreshAccessTokenHandler(
+    IUnitOfWork unitOfWork,
+    IExceptionFactory exceptionFactory,
+    IOptions<JwtOptions> jwtOptions)
+    : IRequestHandler<RefreshAccessTokenDto, JwtTokensDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IExceptionFactory _exceptionFactory;
-    private readonly JwtOptions _jwtOptions;
-
-    public RefreshAccessTokenHandler(IUnitOfWork unitOfWork, IExceptionFactory exceptionFactory,
-        IOptions<JwtOptions> jwtOptions)
-    {
-        _unitOfWork = unitOfWork;
-        _exceptionFactory = exceptionFactory;
-        _jwtOptions = jwtOptions.Value;
-    }
+    private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
     public async Task<JwtTokensDto> Handle(RefreshAccessTokenDto request, CancellationToken ct)
     {
@@ -37,18 +31,18 @@ public class RefreshAccessTokenHandler : IRequestHandler<RefreshAccessTokenDto, 
         var userId = principal.Claims.GetNameIdentifier();
         var jti = principal.Claims.GetJti();
         var exp = principal.Claims.GetExp();
-        _exceptionFactory.ThrowIf<BusinessException>(
+        exceptionFactory.ThrowIf<BusinessException>(
             userId == null || jti == null || exp == null,
             ExceptionCode.System_Authentication_RefreshAccessToken_InvalidRefreshToken,
             args: [nameof(request.RefreshToken)]);
 
-        var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId!.Value, ct);
-        _exceptionFactory.ThrowIf<EntityNotFoundException>(
+        var user = await unitOfWork.Repository<User>().GetByIdAsync(userId!.Value, ct);
+        exceptionFactory.ThrowIf<EntityNotFoundException>(
             user == null || user.IsDeleted,
             ExceptionCode.System_Authentication_RefreshAccessToken_UserNotFound,
             args: [nameof(request.RefreshToken)]);
 
-        _exceptionFactory.ThrowIf<BusinessException>(
+        exceptionFactory.ThrowIf<BusinessException>(
             user!.RefreshTokenId != jti || user.RefreshTokenExpiresAt != exp,
             ExceptionCode.System_Authentication_RefreshAccessToken_InvalidRefreshToken,
             args: [nameof(request.RefreshToken)]);
@@ -61,9 +55,9 @@ public class RefreshAccessTokenHandler : IRequestHandler<RefreshAccessTokenDto, 
         user.RefreshTokenId = refreshToken.Claims.GetJti();
         user.RefreshTokenExpiresAt = refreshToken.Claims.GetExp();
 
-        await _unitOfWork.WithTransactionAsync(() =>
+        await unitOfWork.WithTransactionAsync(() =>
         {
-            _unitOfWork.Repository<User>().Update(user);
+            unitOfWork.Repository<User>().Update(user);
         }, ct);
 
         return new JwtTokensDto
