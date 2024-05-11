@@ -6,7 +6,7 @@ using BoilerPlate.App.Jobs.Recurring;
 
 namespace BoilerPlate.App.Jobs.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class JobsServiceCollectionExtensions
 {
     public static void AddJobs(this IServiceCollection services)
     {

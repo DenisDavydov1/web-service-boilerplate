@@ -11,6 +11,8 @@ using BoilerPlate.Core.Extensions;
 using BoilerPlate.Core.Utils;
 using BoilerPlate.Data.DAL.Extensions;
 using BoilerPlate.Data.Seeds.Extensions;
+using BoilerPlate.Services.HealthChecks.Extensions;
+using BoilerPlate.Services.HealthChecks.Options;
 using BoilerPlate.Services.Kafka.Extensions;
 using BoilerPlate.Services.Kafka.Options;
 using BoilerPlate.Services.System.Extensions;
@@ -55,13 +57,16 @@ if (configuration.IsServiceEnabled<KafkaOptions>() && EnvUtils.IsSwaggerGen == f
 if (configuration.IsServiceEnabled<TelegramOptions>())
     builder.Services.AddTelegram(configuration);
 
+if (configuration.IsServiceEnabled<HealthChecksOptions>())
+    builder.Services.AddServicesHealthChecks(configuration);
+
 builder.Services.AddScoped<ExceptionHandlingMiddleware>();
 builder.Services.AddScoped<JwtValidationMiddleware>();
 
 var app = builder.Build();
 
 app.UseSwaggerWithUi();
-app.UseHealthChecks("/healthz");
+app.UseServicesHealthChecks();
 app.UseSerilogRequestLogging();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<JwtValidationMiddleware>();

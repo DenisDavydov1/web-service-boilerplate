@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BoilerPlate.Data.DAL.Extensions;
 
-public static class ServiceProviderExtensions
+public static class DalServiceProviderExtensions
 {
     public static async Task MigrateDatabase(this IServiceProvider services)
     {

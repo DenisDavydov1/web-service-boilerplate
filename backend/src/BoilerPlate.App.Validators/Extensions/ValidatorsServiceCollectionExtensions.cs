@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BoilerPlate.App.Validators.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class ValidatorsServiceCollectionExtensions
 {
     public static void AddValidators(this IServiceCollection services)
     {

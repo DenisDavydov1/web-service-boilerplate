@@ -3,10 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BoilerPlate.Core.Utils;
 using BoilerPlate.Data.DAL.UnitOfWork;
+using Npgsql;
 
 namespace BoilerPlate.Data.DAL.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class DalServiceCollectionExtensions
 {
     public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
@@ -22,7 +23,12 @@ public static class ServiceCollectionExtensions
                 throw new Exception("Connection string is missing.");
             }
 
-            services.AddDbContext<BoilerPlateDbContext>(options => options.UseNpgsql(connectionString));
+            services.AddDbContext<BoilerPlateDbContext>(options =>
+            {
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+                dataSourceBuilder.EnableDynamicJson();
+                options.UseNpgsql(dataSourceBuilder.Build());
+            });
         }
     }
 

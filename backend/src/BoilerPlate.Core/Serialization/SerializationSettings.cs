@@ -18,5 +18,15 @@ public static class SerializationSettings
         }
     };
 
+    public static JsonSerializerSettings Indented
+    {
+        get
+        {
+            var settings = Default;
+            settings.Formatting = Formatting.Indented;
+            return settings;
+        }
+    }
+
     public static JsonSerializer Serializer => JsonSerializer.Create(Default);
 }

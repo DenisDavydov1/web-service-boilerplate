@@ -1,0 +1,3 @@
+namespace BoilerPlate.Services.HealthChecks.Options.Publishers;
+
+public class LogHealthChecksPublisherOptions : BaseHealthChecksPublisherOptions;

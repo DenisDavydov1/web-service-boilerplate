@@ -6,17 +6,63 @@ namespace BoilerPlate.Core.Extensions;
 
 public static class ServiceOptionsExtensions
 {
-    public static TServiceOptions AddServiceOptions<TServiceOptions>(
-        this IServiceCollection services, IConfiguration configuration)
-        where TServiceOptions : class, IServiceOptions
-    {
-        var optionsSection = configuration.GetSection(TServiceOptions.SectionName);
-        services.Configure<TServiceOptions>(optionsSection);
+    public static void AddServiceOptions<TServiceOptions>(
+        this IServiceCollection services, TServiceOptions options)
+        where TServiceOptions : class, IServiceOptions, new() =>
+        services.AddSingleton(_ => Microsoft.Extensions.Options.Options.Create(options));
 
-        var options = optionsSection.Get<TServiceOptions>();
-        if (options == null)
+    public static TServiceOptions AddServiceOptions<TServiceOptions>(
+        this IServiceCollection services, IConfiguration configuration,
+        Dictionary<string, Dictionary<string, Type>>? polymorphicArraysDescription = null)
+        where TServiceOptions : class, IServiceOptions, new()
+    {
+        var options = configuration.GetServiceOptions<TServiceOptions>(polymorphicArraysDescription);
+        services.AddServiceOptions(options);
+
+        return options;
+    }
+
+    public static TServiceOptions GetServiceOptions<TServiceOptions>(this IConfiguration configuration,
+        Dictionary<string, Dictionary<string, Type>>? polymorphicArraysDescription = null)
+        where TServiceOptions : class, IServiceOptions, new()
+    {
+        var options = new TServiceOptions();
+        configuration.GetSection(TServiceOptions.SectionName).Bind(options);
+
+        if (polymorphicArraysDescription?.Count > 0)
         {
-            throw new Exception($"Configuration options {TServiceOptions.SectionName} are missing");
+            foreach (var (arrayPropertyName, elementPropertiesTypes) in polymorphicArraysDescription)
+            {
+                var elementsOptions = new List<BasePolymorphicArrayElementOptions>();
+
+                for (var i = 0;; i++)
+                {
+                    var root = $"{TServiceOptions.SectionName}:{arrayPropertyName}:{i}";
+                    var typeName = configuration.GetValue<string>($"{root}:Type");
+                    if (typeName == null)
+                    {
+                        break;
+                    }
+
+                    if (Activator.CreateInstance(elementPropertiesTypes[typeName])
+                        is not BasePolymorphicArrayElementOptions elementOptions)
+                    {
+                        throw new Exception($"Invalid {typeName} type options format");
+                    }
+
+                    configuration.GetSection(root).Bind(elementOptions);
+                    elementsOptions.Add(elementOptions);
+                }
+
+                var arrayProperty = typeof(TServiceOptions).GetProperty(arrayPropertyName);
+                if (arrayProperty == null)
+                {
+                    throw new Exception(
+                        $"Property {arrayPropertyName} is not found in {TServiceOptions.SectionName} options");
+                }
+
+                arrayProperty.SetValue(options, elementsOptions);
+            }
         }
 
         return options;

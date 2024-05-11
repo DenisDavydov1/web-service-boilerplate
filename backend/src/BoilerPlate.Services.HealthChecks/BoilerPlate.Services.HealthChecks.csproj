@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BoilerPlate.Core\BoilerPlate.Core.csproj" />
+      <ProjectReference Include="..\BoilerPlate.Services.Kafka\BoilerPlate.Services.Kafka.csproj" />
+      <ProjectReference Include="..\BoilerPlate.Services.System\BoilerPlate.Services.System.csproj" />
+      <ProjectReference Include="..\BoilerPlate.Services.Telegram\BoilerPlate.Services.Telegram.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="8.0.1" />
+      <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="8.0.1" />
+      <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="8.0.1" />
+      <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.4" />
+      <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="8.0.4" />
+    </ItemGroup>
+
+</Project>

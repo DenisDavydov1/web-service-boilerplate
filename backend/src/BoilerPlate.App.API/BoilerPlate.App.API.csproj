@@ -10,10 +10,13 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.12" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.11" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
@@ -51,6 +54,7 @@
     <ProjectReference Include="..\BoilerPlate.Core.Exceptions\BoilerPlate.Core.Exceptions.csproj" />
     <ProjectReference Include="..\BoilerPlate.Data.DAL\BoilerPlate.Data.DAL.csproj" />
     <ProjectReference Include="..\BoilerPlate.Data.Seeds\BoilerPlate.Data.Seeds.csproj" />
+    <ProjectReference Include="..\BoilerPlate.Services.HealthChecks\BoilerPlate.Services.HealthChecks.csproj" />
     <ProjectReference Include="..\BoilerPlate.Services.System\BoilerPlate.Services.System.csproj" />
     <ProjectReference Include="..\BoilerPlate.Services.Telegram\BoilerPlate.Services.Telegram.csproj" />
   </ItemGroup>

@@ -55,6 +55,8 @@ services:
       Jwt__PrivateKey: ${BOILER_PLATE_JWT_PRIVATE_KEY}
       Serilog__WriteTo__1__Args__nodeUris: "http://elastic:${BOILER_PLATE_ELASTIC_PASSWORD}@elasticsearch:9200"
       Telegram__BotToken: ${BOILER_PLATE_TELEGRAM_BOT_TOKEN}
+      HealthChecks__Services__1__Uri: "http://elastic:${BOILER_PLATE_ELASTIC_PASSWORD}@elasticsearch:9200"
+      HealthChecks__Publishers__0__ChatId: "${BOILER_PLATE_HEALTH_CHECKS_TELEGRAM_CHAT_ID}"
     volumes:
       - ./configs/backend/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ${BOILER_PLATE_DATA_PATH}/file-storage:/app/file-storage:rw
@@ -65,7 +67,7 @@ services:
       elasticsearch-setup:
         condition: service_completed_successfully
     healthcheck:
-      test: [ "CMD-SHELL", "curl -v http://localhost/healthz | grep -q 'Healthy'" ]
+      test: [ "CMD-SHELL", "curl -s http://localhost/healthz | grep -q 'Healthy'" ]
       interval: 10s
       timeout: 5s
       retries: 120
@@ -99,8 +101,6 @@ services:
 
   kafka-ui:
     image: provectuslabs/kafka-ui:${BOILER_PLATE_KAFKA_UI_TAG}
-    ports:
-      - ${BOILER_PLATE_KAFKA_UI_PORT}:8080
     networks:
       - boiler-plate-network
     environment:
@@ -111,6 +111,7 @@ services:
       AUTH_TYPE: LOGIN_FORM
       SPRING_SECURITY_USER_NAME: ${BOILER_PLATE_KAFKA_UI_LOGIN}
       SPRING_SECURITY_USER_PASSWORD: ${BOILER_PLATE_KAFKA_UI_PASSWORD}
+      SERVER_SERVLET_CONTEXT_PATH: /kafka-ui
     restart: always
     depends_on:
       - kafka
@@ -160,11 +161,6 @@ services:
     depends_on:
       elasticsearch-setup:
         condition: service_completed_successfully
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'" ]
-      interval: 10s
-      timeout: 5s
-      retries: 120
 
   elasticsearch-setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${BOILER_PLATE_ELK_TAG}

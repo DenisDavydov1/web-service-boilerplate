@@ -5,7 +5,7 @@ using BoilerPlate.Data.Seeds.Common;
 
 namespace BoilerPlate.Data.Seeds.Extensions;
 
-public static class ServiceProviderExtensions
+public static class SeedsServiceProviderExtensions
 {
     public static async Task SeedDatabase(this IServiceProvider services)
     {

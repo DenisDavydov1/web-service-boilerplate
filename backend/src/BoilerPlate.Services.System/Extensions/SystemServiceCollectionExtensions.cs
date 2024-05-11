@@ -4,7 +4,7 @@ using BoilerPlate.Services.System.Users;
 
 namespace BoilerPlate.Services.System.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class SystemServiceCollectionExtensions
 {
     public static void AddSystemServices(this IServiceCollection services)
     {

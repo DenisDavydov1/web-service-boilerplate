@@ -13,6 +13,7 @@ using MediatR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace BoilerPlate.Services.Kafka.Consumer;
@@ -63,6 +64,7 @@ public class KafkaConsumerHostedService : IHostedService, IDisposable
         _consumer = new ConsumerBuilder<Ignore, JObject?>(_consumerConfig)
             .SetValueDeserializer(new StringBytesToJObjectDeserializer())
             .SetErrorHandler(HandleConsumeError)
+            .SetLogHandler(LogHandler)
             .Build();
         _consumer.Subscribe(_topic);
 
@@ -88,6 +90,8 @@ public class KafkaConsumerHostedService : IHostedService, IDisposable
                 var message = consumeResult.Message;
                 var messageId = message.Headers.GetMessageId();
                 var messageType = message.Headers.GetMessageType();
+
+                // LogMessage(messageId, messageType, consumeResult.Topic, consumeResult.Partition, message.Value);
 
                 var notificationTypes = _notificationTypes.GetValueOrDefault(messageType) ?? new List<Type>();
                 foreach (var type in notificationTypes)
@@ -152,5 +156,27 @@ public class KafkaConsumerHostedService : IHostedService, IDisposable
         }
 
         return notificationTypes;
+    }
+
+    private void LogHandler(IConsumer<Ignore, JObject?> consumer, LogMessage message) =>
+        _logger.Log(message.Level.ToLogLevel(), "{Message}", message.Message);
+
+    private void LogMessage(Guid id, KafkaMessageType type, string topic, int? partition, object? payload)
+    {
+        var payloadText = JsonConvert.SerializeObject(payload);
+
+        if (payloadText.Length > 1000)
+        {
+            payloadText = payloadText[..500] + "..." + payloadText[^500..];
+        }
+
+        _logger.LogInformation(
+            "Message received:\n" +
+            "id: {Id}\n" +
+            "type: {Type}\n" +
+            "topic: {Topic}\n" +
+            "partition: {Partition}\n" +
+            "payload: {Payload}\n",
+            id, type, topic, partition, payloadText);
     }
 }

@@ -4,9 +4,9 @@ namespace BoilerPlate.Utils.TsClientGenerator.NameGenerators;
 
 public class InterfaceTypeNameGenerator : ITypeNameGenerator
 {
-    public string Generate(JsonSchema schema, string typeNameHint, IEnumerable<string> reservedTypeNames)
+    public string Generate(JsonSchema schema, string? typeNameHint, IEnumerable<string> reservedTypeNames)
     {
-        typeNameHint = typeNameHint.Replace("Dto", "DTO");
+        typeNameHint = typeNameHint?.Replace("Dto", "DTO") ?? "";
 
         return schema.Type switch
         {
