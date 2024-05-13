@@ -8,5 +8,6 @@ public class TelegramOptions : IServiceOptions
 
     public bool Enabled { get; set; } = true;
 
-    public string BotToken { get; set; } = null!;
+    public IEnumerable<BasePolymorphicArrayElementOptions> Bots { get; set; } =
+        Array.Empty<BasePolymorphicArrayElementOptions>();
 }

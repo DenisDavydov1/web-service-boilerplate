@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 namespace BoilerPlate.Services.HealthChecks.Publishers;
 
 internal class LogHealthChecksPublisher(
-    LogHealthChecksPublisherOptions publisherOptions,
+    LogHealthChecksPublisherOptions options,
     ILogger<LogHealthChecksPublisher> logger)
-    : BaseHealthChecksPublisher<LogHealthChecksPublisherOptions>(publisherOptions)
+    : BaseHealthChecksPublisher<LogHealthChecksPublisherOptions>(options)
 {
     protected override Task PublishInternal(HealthReport report, CancellationToken ct)
     {

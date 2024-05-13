@@ -447,15 +447,31 @@
         }
       }
     },
-    "/api/v1/tests/telegram-send-message": {
+    "/api/v1/tests/send-email": {
       "post": {
         "tags": [
           "Tests"
         ],
-        "summary": "Telegram bot send test message",
+        "summary": "Send email",
         "parameters": [
           {
-            "name": "chatId",
+            "name": "from",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subject",
             "in": "query",
             "style": "form",
             "schema": {
@@ -468,6 +484,47 @@
             "style": "form",
             "schema": {
               "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/tests/email-messages": {
+      "get": {
+        "tags": [
+          "Tests"
+        ],
+        "summary": "Get email messages",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],

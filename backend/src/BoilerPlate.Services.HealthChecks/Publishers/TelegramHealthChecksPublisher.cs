@@ -8,9 +8,9 @@ using Telegram.Bot.Types;
 namespace BoilerPlate.Services.HealthChecks.Publishers;
 
 internal class TelegramHealthChecksPublisher(
-    TelegramHealthChecksPublisherOptions publisherOptions,
+    TelegramHealthChecksPublisherOptions options,
     ITelegramBotClient telegramBotClient)
-    : BaseHealthChecksPublisher<TelegramHealthChecksPublisherOptions>(publisherOptions)
+    : BaseHealthChecksPublisher<TelegramHealthChecksPublisherOptions>(options)
 {
     protected override Task PublishInternal(HealthReport report, CancellationToken ct)
     {
@@ -22,7 +22,7 @@ internal class TelegramHealthChecksPublisher(
         }
 
         return telegramBotClient.SendTextMessageAsync(
-            new ChatId(PublisherOptions.ChatId),
+            new ChatId(Options.ChatId),
             message,
             cancellationToken: ct);
     }

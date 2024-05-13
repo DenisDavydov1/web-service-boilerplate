@@ -5,6 +5,9 @@ using BoilerPlate.Core.Utils;
 using BoilerPlate.Data.Abstractions.Enums;
 using BoilerPlate.Data.DTO.Common.Responses;
 using BoilerPlate.Data.DTO.System.Tests.Requests;
+using BoilerPlate.Services.Mail.ImapService;
+using BoilerPlate.Services.Mail.Message;
+using BoilerPlate.Services.Mail.SmtpService;
 using BoilerPlate.Services.Telegram.BotTestService;
 using Coravel.Invocable;
 using Coravel.Queuing.Interfaces;
@@ -23,15 +26,23 @@ public class TestsController : BaseApiController
 {
     private readonly IQueue _queue;
     private readonly IMediator _mediator;
-    private readonly ITelegramBotTestService _telegramBotTestService;
+    private readonly IMailSmtpService _mailSmtpService;
+    private readonly IMailImapService _mailImapService;
 
     /// <inheritdoc />
-    public TestsController(IMediator mediator, ILogger<TestsController> logger, IExceptionFactory exceptionFactory,
-        IQueue queue, ITelegramBotTestService telegramBotTestService) : base(mediator, logger, exceptionFactory)
+    public TestsController(
+        IMediator mediator,
+        ILogger<TestsController> logger,
+        IExceptionFactory exceptionFactory,
+        IQueue queue,
+        [FromKeyedServices("mail.smtp.logger")] IMailSmtpService mailSmtpService,
+        [FromKeyedServices("mail.imap.test")] IMailImapService mailImapService)
+        : base(mediator, logger, exceptionFactory)
     {
         _mediator = mediator;
         _queue = queue;
-        _telegramBotTestService = telegramBotTestService;
+        _mailSmtpService = mailSmtpService;
+        _mailImapService = mailImapService;
     }
 
     /// <summary> Log out user </summary>
@@ -87,12 +98,34 @@ public class TestsController : BaseApiController
         return Ok();
     }
 
-    /// <summary> Telegram bot send test message </summary>
-    [HttpPost("telegram-send-message")]
+    // /// <summary> Telegram bot send test message </summary>
+    // [HttpPost("telegram-send-message")]
+    // [MinimumRoleAuthorize(UserRole.Admin)]
+    // public async Task<ActionResult> TelegramSendMessage(string chatId, string message, CancellationToken ct)
+    // {
+    //     await _telegramBotTestService.SendMessage(chatId, message, ct);
+    //     return Ok();
+    // }
+
+    /// <summary> Send email </summary>
+    [HttpPost("send-email")]
     [MinimumRoleAuthorize(UserRole.Admin)]
-    public async Task<ActionResult> TelegramSendMessage(string chatId, string message, CancellationToken ct)
+    public async Task<ActionResult> SendEmail(string from, string to, string subject, string message,
+        CancellationToken ct)
     {
-        await _telegramBotTestService.SendMessage(chatId, message, ct);
-        return Ok();
+        var mailMessage = new MailMessage { From = [from], To = [to], Subject = subject, Body = message };
+        var response = await _mailSmtpService.Send(mailMessage, ct);
+        var id = await _mailImapService.AddMessage("Sent Messages", mailMessage, ct);
+
+        return Ok(new { SmtpResponse = response, ImapMessageId = id });
+    }
+
+    /// <summary> Get email messages </summary>
+    [HttpGet("email-messages")]
+    [MinimumRoleAuthorize(UserRole.Admin)]
+    public async Task<ActionResult> GetEmailMessages(string path, int? skip, int? take, CancellationToken ct)
+    {
+        var messages = await _mailImapService.GetMessages(path, skip, take, ct);
+        return Ok(messages);
     }
 }

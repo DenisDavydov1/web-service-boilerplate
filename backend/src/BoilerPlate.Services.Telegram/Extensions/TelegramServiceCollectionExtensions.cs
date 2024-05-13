@@ -1,5 +1,4 @@
 using BoilerPlate.Core.Extensions;
-using BoilerPlate.Core.Options;
 using BoilerPlate.Services.Telegram.BotTestService;
 using BoilerPlate.Services.Telegram.Options;
 using Microsoft.Extensions.Configuration;
@@ -12,14 +11,26 @@ public static class TelegramServiceCollectionExtensions
 {
     public static void AddTelegram(this IServiceCollection services, IConfiguration configuration)
     {
-        var telegramOptions = services.AddServiceOptions<TelegramOptions>(configuration);
+        var telegramOptions = services.AddServiceOptions<TelegramOptions>(configuration,
+        [
+            ("Bots",
+            [
+                (null, typeof(TelegramBotOptions))
+            ])
+        ]);
 
-        services.AddHttpClient("telegram_bot_client")
-            .AddTypedClient<ITelegramBotClient>(httpClient =>
+        foreach (var options in telegramOptions.Bots)
+        {
+            var botOptions = (TelegramBotOptions) options;
+            services.AddHttpClient(botOptions.Name);
+            services.AddKeyedTransient<ITelegramBotClient>(botOptions.Name, (provider, _) =>
             {
-                var botOptions = new TelegramBotClientOptions(telegramOptions.BotToken);
-                return new TelegramBotClient(botOptions, httpClient);
+                var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+                    .CreateClient(botOptions.Name);
+                var botClientOptions = new TelegramBotClientOptions(botOptions.Token);
+                return new TelegramBotClient(botClientOptions, httpClient);
             });
+        }
 
         services.AddScoped<ITelegramBotTestService, TelegramBotTestService>();
     }

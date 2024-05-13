@@ -43,6 +43,9 @@
       <Link>appsettings.Production.json</Link>
       <DependentUpon>appsettings.json</DependentUpon>
     </Content>
+    <Content Update="appsettings.example.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

@@ -12,6 +12,8 @@ public class HealthChecksOptions : IServiceOptions
 
     public int Period { get; set; } = 30;
 
+    public int Timeout { get; set; } = 10;
+
     public IEnumerable<BasePolymorphicArrayElementOptions> Services { get; set; } =
         Array.Empty<BasePolymorphicArrayElementOptions>();
 

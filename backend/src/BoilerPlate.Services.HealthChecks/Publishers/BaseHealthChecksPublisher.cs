@@ -3,15 +3,15 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace BoilerPlate.Services.HealthChecks.Publishers;
 
-internal abstract class BaseHealthChecksPublisher<TPublisherOptions>(TPublisherOptions publisherOptions)
+internal abstract class BaseHealthChecksPublisher<TPublisherOptions>(TPublisherOptions options)
     : IHealthCheckPublisher
     where TPublisherOptions : BaseHealthChecksPublisherOptions
 {
-    protected readonly TPublisherOptions PublisherOptions = publisherOptions;
+    protected readonly TPublisherOptions Options = options;
 
     public Task PublishAsync(HealthReport report, CancellationToken ct)
     {
-        if (PublisherOptions.PublishOnlyErrors && report.Status == HealthStatus.Healthy)
+        if (Options.PublishOnlyErrors && report.Status == HealthStatus.Healthy)
         {
             return Task.CompletedTask;
         }

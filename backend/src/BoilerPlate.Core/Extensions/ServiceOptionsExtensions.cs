@@ -13,7 +13,7 @@ public static class ServiceOptionsExtensions
 
     public static TServiceOptions AddServiceOptions<TServiceOptions>(
         this IServiceCollection services, IConfiguration configuration,
-        Dictionary<string, Dictionary<string, Type>>? polymorphicArraysDescription = null)
+        (string property, (string? typeName, Type type)[])[]? polymorphicArraysDescription = null)
         where TServiceOptions : class, IServiceOptions, new()
     {
         var options = configuration.GetServiceOptions<TServiceOptions>(polymorphicArraysDescription);
@@ -23,13 +23,13 @@ public static class ServiceOptionsExtensions
     }
 
     public static TServiceOptions GetServiceOptions<TServiceOptions>(this IConfiguration configuration,
-        Dictionary<string, Dictionary<string, Type>>? polymorphicArraysDescription = null)
+        (string property, (string? typeName, Type type)[])[]? polymorphicArraysDescription = null)
         where TServiceOptions : class, IServiceOptions, new()
     {
         var options = new TServiceOptions();
         configuration.GetSection(TServiceOptions.SectionName).Bind(options);
 
-        if (polymorphicArraysDescription?.Count > 0)
+        if (polymorphicArraysDescription?.Length > 0)
         {
             foreach (var (arrayPropertyName, elementPropertiesTypes) in polymorphicArraysDescription)
             {
@@ -38,14 +38,15 @@ public static class ServiceOptionsExtensions
                 for (var i = 0;; i++)
                 {
                     var root = $"{TServiceOptions.SectionName}:{arrayPropertyName}:{i}";
-                    var typeName = configuration.GetValue<string>($"{root}:Type");
-                    if (typeName == null)
+                    if (configuration.GetSection(root).Exists() == false)
                     {
                         break;
                     }
 
-                    if (Activator.CreateInstance(elementPropertiesTypes[typeName])
-                        is not BasePolymorphicArrayElementOptions elementOptions)
+                    var typeName = configuration.GetValue<string>($"{root}:Type");
+                    var type = elementPropertiesTypes.First(x => x.typeName == typeName).type;
+
+                    if (Activator.CreateInstance(type) is not BasePolymorphicArrayElementOptions elementOptions)
                     {
                         throw new Exception($"Invalid {typeName} type options format");
                     }

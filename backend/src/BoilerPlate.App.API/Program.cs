@@ -15,6 +15,8 @@ using BoilerPlate.Services.HealthChecks.Extensions;
 using BoilerPlate.Services.HealthChecks.Options;
 using BoilerPlate.Services.Kafka.Extensions;
 using BoilerPlate.Services.Kafka.Options;
+using BoilerPlate.Services.Mail.Extensions;
+using BoilerPlate.Services.Mail.Options;
 using BoilerPlate.Services.System.Extensions;
 using BoilerPlate.Services.Telegram.Extensions;
 using BoilerPlate.Services.Telegram.Options;
@@ -56,6 +58,9 @@ if (configuration.IsServiceEnabled<KafkaOptions>() && EnvUtils.IsSwaggerGen == f
 
 if (configuration.IsServiceEnabled<TelegramOptions>())
     builder.Services.AddTelegram(configuration);
+
+if (configuration.IsServiceEnabled<MailOptions>())
+    builder.Services.AddMail(configuration);
 
 if (configuration.IsServiceEnabled<HealthChecksOptions>())
     builder.Services.AddServicesHealthChecks(configuration);

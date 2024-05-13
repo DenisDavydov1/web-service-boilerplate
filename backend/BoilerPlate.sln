@@ -75,6 +75,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.Services.Telegr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.Services.HealthChecks", "src\BoilerPlate.Services.HealthChecks\BoilerPlate.Services.HealthChecks.csproj", "{9DEBCBEB-B35C-40BB-BB19-C1D4209E2023}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoilerPlate.Services.Mail", "src\BoilerPlate.Services.Mail\BoilerPlate.Services.Mail.csproj", "{D41E166C-EE2C-4116-853E-E603243D3A4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +175,10 @@ Global
 		{9DEBCBEB-B35C-40BB-BB19-C1D4209E2023}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DEBCBEB-B35C-40BB-BB19-C1D4209E2023}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DEBCBEB-B35C-40BB-BB19-C1D4209E2023}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D41E166C-EE2C-4116-853E-E603243D3A4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D41E166C-EE2C-4116-853E-E603243D3A4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D41E166C-EE2C-4116-853E-E603243D3A4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D41E166C-EE2C-4116-853E-E603243D3A4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7A743853-CBAE-4678-AF09-DE985A820C40} = {79BFC0EB-F987-42D1-A3AA-486522E2F4DC}
@@ -205,5 +211,6 @@ Global
 		{9952F359-59B2-446B-937D-C660C5372C66} = {BD92142E-C92F-43B7-A2CF-6049962F1632}
 		{5361293D-5C23-4D2E-913D-3CF53FCBFC8B} = {75808891-2011-4419-8C80-3E138AF740B6}
 		{9DEBCBEB-B35C-40BB-BB19-C1D4209E2023} = {75808891-2011-4419-8C80-3E138AF740B6}
+		{D41E166C-EE2C-4116-853E-E603243D3A4B} = {75808891-2011-4419-8C80-3E138AF740B6}
 	EndGlobalSection
 EndGlobal

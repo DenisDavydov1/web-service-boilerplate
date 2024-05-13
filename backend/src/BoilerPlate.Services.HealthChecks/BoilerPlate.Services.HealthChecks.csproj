@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\BoilerPlate.Core\BoilerPlate.Core.csproj" />
       <ProjectReference Include="..\BoilerPlate.Services.Kafka\BoilerPlate.Services.Kafka.csproj" />
+      <ProjectReference Include="..\BoilerPlate.Services.Mail\BoilerPlate.Services.Mail.csproj" />
       <ProjectReference Include="..\BoilerPlate.Services.System\BoilerPlate.Services.System.csproj" />
       <ProjectReference Include="..\BoilerPlate.Services.Telegram\BoilerPlate.Services.Telegram.csproj" />
     </ItemGroup>

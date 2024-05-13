@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using BoilerPlate.Core.Concurrency;
 using ManagedCode.MimeTypes;
 
 namespace BoilerPlate.Core.Http;
@@ -8,6 +9,7 @@ public class HttpHandler : IDisposable
 {
     private HttpClient _httpClient = new();
     private readonly Stopwatch _stopwatch = new();
+    private readonly SemaphoreLocker _semaphoreLocker = new();
 
     public Dictionary<string, string> Headers { get; set; } = new();
     public TimeSpan Elapsed => _stopwatch.Elapsed;
@@ -23,6 +25,12 @@ public class HttpHandler : IDisposable
             AllowAutoRedirect = false
         });
 
+        return this;
+    }
+
+    public HttpHandler Timeout(int seconds)
+    {
+        _httpClient.Timeout = TimeSpan.FromSeconds(seconds);
         return this;
     }
 
@@ -90,12 +98,13 @@ public class HttpHandler : IDisposable
         return request;
     }
 
-    private async Task<HttpResponseMessage> SendAndTrackTime(HttpRequestMessage request, CancellationToken ct)
-    {
-        _stopwatch.Restart();
-        var response = await _httpClient.SendAsync(request, ct);
-        _stopwatch.Stop();
+    private async Task<HttpResponseMessage> SendAndTrackTime(HttpRequestMessage request, CancellationToken ct) =>
+        await _semaphoreLocker.LockAsync(async () =>
+        {
+            _stopwatch.Restart();
+            var response = await _httpClient.SendAsync(request, ct);
+            _stopwatch.Stop();
 
-        return response;
-    }
+            return response;
+        });
 }

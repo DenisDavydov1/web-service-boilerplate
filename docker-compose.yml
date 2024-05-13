@@ -54,7 +54,7 @@ services:
       Jwt__PublicKey: ${BOILER_PLATE_JWT_PUBLIC_KEY}
       Jwt__PrivateKey: ${BOILER_PLATE_JWT_PRIVATE_KEY}
       Serilog__WriteTo__1__Args__nodeUris: "http://elastic:${BOILER_PLATE_ELASTIC_PASSWORD}@elasticsearch:9200"
-      Telegram__BotToken: ${BOILER_PLATE_TELEGRAM_BOT_TOKEN}
+      Telegram__Bots__0__Token: ${BOILER_PLATE_TELEGRAM_BOT_TOKEN}
       HealthChecks__Services__1__Uri: "http://elastic:${BOILER_PLATE_ELASTIC_PASSWORD}@elasticsearch:9200"
       HealthChecks__Publishers__0__ChatId: "${BOILER_PLATE_HEALTH_CHECKS_TELEGRAM_CHAT_ID}"
     volumes:
@@ -67,7 +67,7 @@ services:
       elasticsearch-setup:
         condition: service_completed_successfully
     healthcheck:
-      test: [ "CMD-SHELL", "curl -s http://localhost/healthz | grep -q 'Healthy'" ]
+      test: [ "CMD-SHELL", "curl -s http://localhost/health/backend | grep -q 'Healthy'" ]
       interval: 10s
       timeout: 5s
       retries: 120
