@@ -1,5 +1,9 @@
 namespace BoilerPlate.Core.Concurrency;
 
+/// <summary>
+/// Deadlock-safe async semaphore locker
+/// </summary>
+/// <remarks>https://stackoverflow.com/a/50139704</remarks>
 public class SemaphoreLocker
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);

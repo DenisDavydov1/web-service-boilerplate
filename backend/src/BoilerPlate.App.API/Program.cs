@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Security.Cryptography;
 using BoilerPlate.App.API.Extensions;
 using BoilerPlate.App.API.Middlewares;
 using BoilerPlate.App.Handlers.Extensions;
@@ -84,4 +85,10 @@ if (EnvUtils.IsSwaggerGen == false)
     await app.Services.MigrateDatabase();
     await app.Services.SeedDatabase();
     app.Run();
+}
+
+/// <summary> For integration tests </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
+public partial class Program
+{
 }
